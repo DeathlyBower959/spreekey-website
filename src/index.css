@@ -1,0 +1,90 @@
+/* @font-face {
+  font-family: "FONTNAME";
+  src: local("FILENAME"),
+    url("./font/FILENAME.ttf") format("truetype");
+} */
+
+/* Variables */
+:root {
+  --background: #080a0a;
+  --secondary-background: #191f1f;
+  --nav-background: 23, 36, 36; /* rgba(23, 36, 36) */
+
+  --foreground: #acc3bb;
+  --secondary-foreground: #ddd;
+
+  /* --accent: #b3934e; */
+  --accent: #911a24;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #72141c66;
+  --scrollbar-thumb-hover: #72141c88;
+  --scrollbar-track: transparent;
+  --scrollbar-track-hover: var(--scrollbar-track);
+}
+
+/* 
+#B41825
+#491D23
+#22181C
+#090B0B
+#ACC3BB
+ */
+
+/* Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'FONTNAME', 'Courier', Verdana, Tahoma, Geneva, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Chrome, Edge and Safari */
+*::-webkit-scrollbar {
+  width: 7px;
+}
+*::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background-color: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-track:hover,
+*::-webkit-scrollbar-track:active {
+  background-color: var(--scrollbar-track-hover);
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: var(--scrollbar-thumb);
+}
+
+*::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
