@@ -1,11 +1,14 @@
 import styled from 'styled-components'
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Squeeze as SqueezeMenu } from 'hamburger-react'
 
 import Logo from '../atoms/icons/Logo'
 
-const Navbar: React.FC<{ isLanding: boolean }> = ({ isLanding }) => {
+const Navbar: React.FC = () => {
+  const location = useLocation()
+  const isLanding = location.pathname === '/'
+
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(!isLanding)
 
@@ -14,6 +17,7 @@ const Navbar: React.FC<{ isLanding: boolean }> = ({ isLanding }) => {
   }
 
   useEffect(() => {
+    setIsScrolled(!isLanding)
     if (isLanding) document.addEventListener('scroll', onScroll)
 
     return () => {
@@ -23,7 +27,7 @@ const Navbar: React.FC<{ isLanding: boolean }> = ({ isLanding }) => {
 
   return (
     <>
-      <Nav isScrolled={isScrolled}>
+      <Nav isScrolled={isScrolled} isLanding={isLanding}>
         <NavInnerLeft as={Link} to='/' tabIndex={0}>
           <Logo color={'var(--foreground)'} />
           <NavName>[ art of spreekey ]</NavName>
@@ -33,6 +37,7 @@ const Navbar: React.FC<{ isLanding: boolean }> = ({ isLanding }) => {
             <NavLink to='/gallery'>Gallery</NavLink>
             <NavLink to='/commissions'>Commissions</NavLink>
             <NavLink to='/store'>Store</NavLink>
+            <NavLink to='/about'>About</NavLink>
           </NavLinkWrapper>
           <SqueezeWrapper>
             <SqueezeMenu
@@ -50,7 +55,7 @@ const Navbar: React.FC<{ isLanding: boolean }> = ({ isLanding }) => {
 }
 
 // Nav
-const Nav = styled.nav<{ isScrolled: boolean }>`
+const Nav = styled.nav<{ isScrolled: boolean; isLanding: boolean }>`
   height: 5em;
   background-color: rgba(var(--nav-background), 0.867);
   backdrop-filter: blur(12px);
@@ -59,14 +64,16 @@ const Nav = styled.nav<{ isScrolled: boolean }>`
   justify-content: space-between;
   padding: 0 1em;
 
-  position: fixed;
+  position: ${props => (props.isScrolled ? 'sticky' : 'fixed')};
   left: 0;
   right: 0;
-  top: ${props => (props.isScrolled ? '0%' : '-12%')};
+  top: ${props => (props.isScrolled ? '0' : '-12%')};
   opacity: ${props => (props.isScrolled ? '1' : '0')};
 
   transition: top 1s ease-out,
     opacity 1s ease-out ${props => (props.isScrolled ? '500ms' : '1ms')};
+
+  ${props => !props.isLanding && 'transition: none;'}
 
   :focus-within {
     top: 0;
@@ -100,7 +107,7 @@ const NavLink = styled(Link)`
 const NavLinkWrapper = styled.div<{ isMenuOpen: boolean }>`
   display: flex;
   align-items: center;
-  gap: 1em;
+  gap: 2em;
 
   @media only screen and (max-width: 768px) {
     transition: 500ms ease;
@@ -108,7 +115,7 @@ const NavLinkWrapper = styled.div<{ isMenuOpen: boolean }>`
 
     flex-direction: column;
     position: absolute;
-    width: 100vw;
+    width: ${props => (!props.isMenuOpen ? `0vw;` : '100vw')};
     height: 100vh;
     right: 0;
     top: 0;
@@ -125,8 +132,6 @@ const NavLinkWrapper = styled.div<{ isMenuOpen: boolean }>`
     ${NavLink}:last-child {
       border-bottom: none;
     }
-
-    ${props => !props.isMenuOpen && `width: 0vw;`}
   }
 
   @media only screen and (max-height: 500px) {

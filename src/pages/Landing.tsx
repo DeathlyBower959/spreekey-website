@@ -1,16 +1,18 @@
 import React from 'react'
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 import Footer from '../components/Footer'
-
-import Logo from '../atoms/icons/Logo'
-import Watermark from '../atoms/icons/Watermark'
 
 import HeroImage from '../assets/background/hero-section.jpg'
 import GalleryImage from '../assets/background/gallery-section.jpg'
 import CommissionsImage from '../assets/background/commissions-section.jpg'
+import StoreImage from '../assets/background/store-section.jpg'
 
-import { Link } from 'react-router-dom'
+import LazyImage from '../atoms/LazyImage'
+
+import Logo from '../atoms/icons/Logo'
+import Watermark from '../atoms/icons/Watermark'
 import KoFi from '../atoms/icons/socials/Ko-Fi'
 import Instagram from '../atoms/icons/socials/Instagram'
 import Twitter from '../atoms/icons/socials/Twitter'
@@ -32,12 +34,9 @@ const Landing: React.FC<{}> = () => {
       </HeroSection>
 
       <AboutMeSection>
-        illustrator and avid character designer Lorem ipsum dolor sit, amet
-        consectetur adipisicing elit. Mollitia quod nihil, quaerat pariatur
-        earum, neque laboriosam voluptatem sint, saepe accusantium consequuntur
-        provident. Dolore, dolorem. Culpa consequatur, praesentium debitis illum
-        nihil facere beatae velit a, itaque odio exercitationem? In, beatae
-        maxime.
+        avid character designer and illustrator, adamant on expanding their
+        knowledge
+        <ReadMoreAbout to='/about'>Read more</ReadMoreAbout>
       </AboutMeSection>
 
       <GallerySection>
@@ -54,41 +53,41 @@ const Landing: React.FC<{}> = () => {
         <SectionBGImage src={CommissionsImage} />
       </CommissionsSection>
 
-      <StoreSection></StoreSection>
+      <StoreSection>
+        <Title>Store</Title>
+        <SubHeader>Purchase some merchandise from my store</SubHeader>
+        <Button to='/store'>Store</Button>
+        <SectionBGImage src={StoreImage} />
+      </StoreSection>
       {/* Push to secondary github branch */}
 
       <SupportSection>
-        <SupportUpper>
+        <SupportUpper target='_blank' href='https://ko-fi.com/spreekey'>
           <IconWrapper children={<KoFi />} />
-          <SupportText as={Link} to='/support'>
-            Support Me!
-          </SupportText>
+          <SupportText>Support Me!</SupportText>
         </SupportUpper>
         <SupportDivider />
         <SupportLower>
-          <SupportLowerInner>
+          <SupportLowerInner
+            target='_blank'
+            href='https://www.instagram.com/spreekey/'
+          >
             <IconWrapper children={<Instagram />} />
-            <SupportText
-              target='_blank'
-              href='https://www.instagram.com/spreekey/'
-            >
-              @spreekey
-            </SupportText>
+            <SupportText>@spreekey</SupportText>
           </SupportLowerInner>
-          <SupportLowerInner>
+          <SupportLowerInner
+            target='_blank'
+            href='https://www.twitter.com/spreekey/'
+          >
             <IconWrapper children={<Twitter />} />
-            <SupportText
-              target='_blank'
-              href='https://www.twitter.com/spreekey/'
-            >
-              @spreekey
-            </SupportText>
+            <SupportText>@spreekey</SupportText>
           </SupportLowerInner>
-          <SupportLowerInner>
+          <SupportLowerInner
+            target='_blank'
+            href='https://www.toyhou.se/spreekey/'
+          >
             <IconWrapper children={<ToyHouse />} />
-            <SupportText target='_blank' href='https://www.toyhou.se/spreekey/'>
-              spreekey
-            </SupportText>
+            <SupportText>spreekey</SupportText>
           </SupportLowerInner>
         </SupportLower>
       </SupportSection>
@@ -106,7 +105,7 @@ const Section = styled.section`
   /* box-shadow: 0 0 50px 50px var(--background) inset; */
   margin-bottom: 5rem !important;
 `
-const SectionBGImage = styled.img`
+const SectionBGImage = styled(LazyImage)`
   position: absolute;
   width: 100%;
   height: 100%;
@@ -130,12 +129,15 @@ const AboutMeSection = styled(Section).attrs({ id: 'about-me-section' })`
   width: 80%;
   margin: 0 auto;
   text-align: center;
-  padding: 1.5em 0;
+  /* padding: 1.5em 0; */
   font-size: 1.5em;
 
   max-width: 45em;
+
+  display: flex;
+  flex-direction: column;
 `
-const GallerySection = styled(Section).attrs({ id: 'gallery-section' })`
+const MainSections = styled(Section)`
   height: 30em;
 
   display: flex;
@@ -145,19 +147,11 @@ const GallerySection = styled(Section).attrs({ id: 'gallery-section' })`
 
   gap: 2em;
 `
-const CommissionsSection = styled(Section).attrs({
+const GallerySection = styled(MainSections).attrs({ id: 'gallery-section' })``
+const CommissionsSection = styled(MainSections).attrs({
   id: 'commissions-section',
-})`
-  height: 30em;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 2em;
-`
-const StoreSection = styled(Section).attrs({ id: 'store-section' })``
+})``
+const StoreSection = styled(MainSections).attrs({ id: 'store-section' })``
 const SupportSection = styled(Section).attrs({ id: 'support-section' })``
 
 // Hero Page
@@ -181,11 +175,21 @@ const LogoContainer = styled.div`
   align-items: center;
 `
 
+// About Me
+const ReadMoreAbout = styled(Link)`
+  text-decoration: none;
+  color: var(--secondary-foreground);
+  margin-top: 0.5em;
+  font-size: 0.85em;
+`
+
 // Support Page
-const SupportUpper = styled.div`
+const SupportUpper = styled.a`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  text-decoration: none;
 `
 const SupportLower = styled.div`
   display: flex;
@@ -194,15 +198,19 @@ const SupportLower = styled.div`
   flex-wrap: wrap;
   gap: 3em;
 `
-const SupportLowerInner = styled(SupportLower)`
+const SupportLowerInner = styled(SupportLower).attrs({ as: 'a' })<{
+  target: string
+  href: string
+}>`
   gap: 0;
+  text-decoration: none;
 `
 const SupportDivider = styled.hr`
   margin: 2em auto;
   width: 70%;
   border-color: var(--secondary-background);
 `
-const SupportText = styled.a`
+const SupportText = styled.p`
   font-size: 2em;
   text-decoration: none;
   color: var(--foreground);
@@ -225,8 +233,8 @@ const SubHeader = styled.h3`
 const Button = styled(Link)`
   padding: 1em 2em;
   background-color: transparent;
-  border: 3px solid var(--accent);
-  color: var(--accent);
+  border: 3px solid var(--foreground);
+  color: var(--foreground);
   text-transform: uppercase;
   font-size: 1.25em;
   font-weight: bold;
@@ -239,7 +247,7 @@ const Button = styled(Link)`
 
   transition: 500ms ease;
   &:before {
-    background-color: var(--accent);
+    background-color: var(--foreground);
     content: '';
     display: block;
     position: absolute;
@@ -257,7 +265,7 @@ const Button = styled(Link)`
   }
 
   &:hover {
-    color: var(--foreground);
+    color: var(--accent);
     transition: 0.25s;
   }
 
