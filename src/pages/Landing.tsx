@@ -1,14 +1,15 @@
+// Packages
 import React from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-import Footer from '../components/Footer'
-
+// Assets
 import HeroImage from '../assets/background/hero-section.jpg'
 import GalleryImage from '../assets/background/gallery-section.jpg'
 import CommissionsImage from '../assets/background/commissions-section.jpg'
 import StoreImage from '../assets/background/store-section.jpg'
 
+// Atoms
 import LazyImage from '../atoms/LazyImage'
 
 import Logo from '../atoms/icons/Logo'
@@ -18,7 +19,14 @@ import Instagram from '../atoms/icons/socials/Instagram'
 import Twitter from '../atoms/icons/socials/Twitter'
 import ToyHouse from '../atoms/icons/socials/ToyHouse'
 
-const Landing: React.FC<{}> = () => {
+// Types
+interface SupportLowerInnerProps {
+  target: string
+  href: string
+}
+
+// Main
+function Landing() {
   return (
     <>
       <HeroSection>
@@ -87,12 +95,10 @@ const Landing: React.FC<{}> = () => {
             href='https://www.toyhou.se/spreekey/'
           >
             <IconWrapper children={<ToyHouse />} />
-            <SupportText>spreekey</SupportText>
+            <SupportText>@spreekey</SupportText>
           </SupportLowerInner>
         </SupportLower>
       </SupportSection>
-
-      <Footer></Footer>
     </>
   )
 }
@@ -103,7 +109,7 @@ const Section = styled.section`
   position: relative;
   overflow-y: hidden;
   /* box-shadow: 0 0 50px 50px var(--background) inset; */
-  margin-bottom: 5rem !important;
+  margin-bottom: 7rem !important;
 `
 const SectionBGImage = styled(LazyImage)`
   position: absolute;
@@ -138,7 +144,7 @@ const AboutMeSection = styled(Section).attrs({ id: 'about-me-section' })`
   flex-direction: column;
 `
 const MainSections = styled(Section)`
-  height: 30em;
+  height: 50em;
 
   display: flex;
   flex-direction: column;
@@ -198,10 +204,9 @@ const SupportLower = styled.div`
   flex-wrap: wrap;
   gap: 3em;
 `
-const SupportLowerInner = styled(SupportLower).attrs({ as: 'a' })<{
-  target: string
-  href: string
-}>`
+const SupportLowerInner = styled(SupportLower).attrs({
+  as: 'a',
+})<SupportLowerInnerProps>`
   gap: 0;
   text-decoration: none;
 `
@@ -214,6 +219,10 @@ const SupportText = styled.p`
   font-size: 2em;
   text-decoration: none;
   color: var(--foreground);
+
+  @media only screen and (max-width: 500px) {
+    font-size: 1.5em;
+  }
 `
 const IconWrapper = styled.div`
   width: 6em;
@@ -223,6 +232,9 @@ const IconWrapper = styled.div`
 // UI
 const Title = styled.h1`
   font-size: 3em;
+  @media only screen and (max-width: 400px) {
+    font-size: 2em;
+  }
 `
 const SubHeader = styled.h3`
   text-align: center;

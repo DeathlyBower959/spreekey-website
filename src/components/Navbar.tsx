@@ -1,11 +1,24 @@
+// Packages
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Squeeze as SqueezeMenu } from 'hamburger-react'
 
+// Atoms
 import Logo from '../atoms/icons/Logo'
 
-const Navbar: React.FC = () => {
+// Types
+interface NavProps {
+  isScrolled: boolean
+  isLanding: boolean
+}
+
+interface NavLinkWrapperProps {
+  isMenuOpen: boolean
+}
+
+// Main
+function Navbar() {
   const location = useLocation()
   const isLanding = location.pathname === '/'
 
@@ -55,7 +68,7 @@ const Navbar: React.FC = () => {
 }
 
 // Nav
-const Nav = styled.nav<{ isScrolled: boolean; isLanding: boolean }>`
+const Nav = styled.nav<NavProps>`
   height: 5em;
   background-color: rgba(var(--nav-background), 0.867);
   backdrop-filter: blur(12px);
@@ -104,7 +117,7 @@ const NavLink = styled(Link)`
   color: var(--foreground);
   font-size: 1.1em;
 `
-const NavLinkWrapper = styled.div<{ isMenuOpen: boolean }>`
+const NavLinkWrapper = styled.div<NavLinkWrapperProps>`
   display: flex;
   align-items: center;
   gap: 2em;
@@ -140,7 +153,7 @@ const NavLinkWrapper = styled.div<{ isMenuOpen: boolean }>`
     height: min-content;
   }
 `
-// TODO: Not centered vertically?
+
 const NavName = styled.p`
   color: var(--foreground);
   user-select: none;

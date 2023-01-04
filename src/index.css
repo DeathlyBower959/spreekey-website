@@ -6,13 +6,17 @@
 
 /* Variables */
 :root {
+  /* Background */
   --background: #080a0a;
   --secondary-background: #191f1f;
+  --tertiary-background: #273030;
   --nav-background: 23, 36, 36; /* rgba(23, 36, 36) */
 
+  /* Foreground */
   --foreground: #acc3bb;
   --secondary-foreground: #404a46;
 
+  /* Accent */
   /* --accent: #b3934e; */
   --accent: #911a24;
   --link-accent: #94d9c1;
