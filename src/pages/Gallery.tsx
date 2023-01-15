@@ -4,11 +4,16 @@ import { useRef, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AiFillHome } from 'react-icons/ai'
 
-const YearRange = [2017, new Date().getFullYear()]
+// Config
+import { YEAR_RANGE } from '../config'
+
+// Util
+import capitalize from '../util/upperCaseFirst'
+
 function DisplayYearSidebar(sector: string = 'main') {
   let out = []
 
-  for (let i = YearRange[1]; i >= YearRange[0]; i--) {
+  for (let i = YEAR_RANGE[1]; i >= YEAR_RANGE[0]; i--) {
     out.push(
       <SidebarYear to={`/gallery/${i}/${sector}`} key={i}>
         {i}
@@ -21,10 +26,13 @@ function DisplayYearSidebar(sector: string = 'main') {
 
 // Types
 interface ISidebar {
-  isExpanded: boolean
+  isAlwaysShow: boolean
 }
 interface IYearBar {
   isHidden: boolean
+}
+interface ISelectedSelector {
+  active: boolean
 }
 
 // Main
@@ -38,27 +46,26 @@ function Gallery() {
 
   // Effect
   useEffect(() => {
-    if (!year || !sector) return
-    navigate(`/gallery/${year}/${dropdownRef.current?.value.toLowerCase()}`)
+    if (!sector || !dropdownRef.current) return
+
+    if (sector === 'main' || sector === 'alt' || sector === 'sketches')
+      dropdownRef.current.value = capitalize(sector)
+    else navigate(`/gallery/${year}/main`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sector])
 
   // Events
-  function handleDropdownChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  function handleLinkClick(e: React.MouseEvent<HTMLHeadingElement>) {
     navigate(
-      `/gallery/${year || YearRange[1]}/${
-        e.target.value.toLowerCase() || 'main'
+      `/gallery/${year || YEAR_RANGE[1]}/${
+        e.currentTarget.innerHTML.toLowerCase() || 'main'
       }`
     )
   }
 
   return (
     <Wrapper>
-      <Sidebar isExpanded={!year}>
-        <ArtSectorDropdown ref={dropdownRef} onChange={handleDropdownChange}>
-          <option>Main</option>
-          <option>Alt</option>
-          <option>Sketches</option>
-        </ArtSectorDropdown>
+      <Sidebar isAlwaysShow={!year}>
         <YearWrapper>{DisplayYearSidebar(sector)}</YearWrapper>
         <Link to='/gallery'>
           <HomeButton />
@@ -67,6 +74,23 @@ function Gallery() {
       <Main>
         <YearBar isHidden={!year}>
           <SelectedYear>{year || ''}</SelectedYear>
+          <SelectorWrapper>
+            <SelectedSector
+              active={sector === 'main'}
+              onClick={handleLinkClick}
+            >
+              Main
+            </SelectedSector>
+            <SelectedSector
+              active={sector === 'sketches'}
+              onClick={handleLinkClick}
+            >
+              Sketches
+            </SelectedSector>
+            <SelectedSector active={sector === 'alt'} onClick={handleLinkClick}>
+              Alt
+            </SelectedSector>
+          </SelectorWrapper>
         </YearBar>
       </Main>
     </Wrapper>
@@ -80,21 +104,44 @@ const Wrapper = styled.div`
 `
 
 const Sidebar = styled.div<ISidebar>`
-  width: ${props => (props.isExpanded ? '10em' : '0')};
+  width: ${props => (props.isAlwaysShow ? '10em' : '0')};
   text-align: center;
   background-color: var(--secondary-background);
 
-  padding-top: 4em;
+  padding-top: 3em;
   padding-bottom: 2em;
 
-  transition: width 1s ease;
+  transition: width 750ms ease;
   overflow: hidden;
   height: 100vh;
 
   display: flex;
   flex-direction: column;
+
+  &::after {
+    display: ${props => (props.isAlwaysShow ? 'none' : 'block')};
+
+    content: '';
+    position: fixed;
+    width: 1em;
+    height: 4em;
+    background-color: inherit;
+    top: 15%;
+
+    left: -2px;
+    border-left: 2px solid var(--tertiary-background);
+
+    border-radius: 0 8px 8px 0;
+
+    transition: left 750ms ease;
+  }
+  &:hover::after {
+    left: calc(10em - 1px);
+  }
+  &:hover {
+    width: 10em;
+  }
 `
-const ArtSectorDropdown = styled.select``
 const YearWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -109,6 +156,7 @@ const YearWrapper = styled.div`
   padding: 2em 0 6em 0;
   margin-top: 2em;
 
+  overflow-x: hidden;
   overflow-y: auto;
 
   flex-grow: 1;
@@ -143,7 +191,25 @@ const YearBar = styled.div<IYearBar>`
   height: ${props => (props.isHidden ? '0' : '10em')};
   background-color: var(--tertiary-background);
   overflow: hidden;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
 `
-const SelectedYear = styled.h1``
+const SelectorWrapper = styled.div`
+  display: flex;
+  gap: 1em;
+`
+const SelectedYear = styled.h1`
+  font-size: 4em;
+`
+const SelectedSector = styled.h3<ISelectedSelector>`
+  cursor: pointer;
+
+  text-decoration: ${props => (props.active ? 'underline' : 'none')};
+  text-decoration-thickness: 3px;
+`
 
 export default Gallery

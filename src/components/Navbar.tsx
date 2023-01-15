@@ -152,7 +152,7 @@ const Nav = styled.nav<INavProps>`
   opacity: ${props => (props.isMenuOpen ? '1' : '0')};
 
   transition: top 1s ease-out,
-    opacity 1s ease-out ${props => (props.isMenuOpen ? '500ms' : '1ms')};
+    opacity 250ms ease-out ${props => (props.isMenuOpen ? '500ms' : '1ms')};
 
   ${isTouch() ? '&' : ':focus-within'} {
     top: 0;
