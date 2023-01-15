@@ -1,13 +1,8 @@
-// Packages
-import { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { Link, useLocation } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { Squeeze as SqueezeMenu } from 'hamburger-react'
 
-// Util
-import isTouch from '../util/isTouch'
-
-// Atoms
 import Logo from '../atoms/icons/Logo'
 
 // Types
@@ -48,7 +43,6 @@ function Navbar() {
       ? isMenuOpen.isHovered || isMenuOpen.isScrolled
       : isMenuOpen
 
-  // Events
   function onScroll() {
     setIsMenuOpen(prev => {
       if (typeof prev === 'object')
@@ -82,7 +76,6 @@ function Navbar() {
     })
   }
 
-  // Effect
   useEffect(() => {
     onScroll()
     window.scrollTo(0, 0)
@@ -98,9 +91,8 @@ function Navbar() {
 
     return () => {
       document.removeEventListener('scroll', onScroll)
-      document.removeEventListener('mousemove', onMouseMove)
     }
-  }, [location.pathname])
+  }, [isLanding])
 
   return (
     <>
@@ -117,7 +109,6 @@ function Navbar() {
             <NavLink to='/gallery'>Gallery</NavLink>
             <NavLink to='/commissions'>Commissions</NavLink>
             <NavLink to='/store'>Store</NavLink>
-            <NavLink to='/about'>About</NavLink>
           </NavLinkWrapper>
           <SqueezeWrapper>
             <SqueezeMenu
@@ -135,7 +126,7 @@ function Navbar() {
 }
 
 // Nav
-const Nav = styled.nav<INavProps>`
+const Nav = styled.nav<{ isScrolled: boolean }>`
   height: 5em;
   background-color: rgba(var(--nav-background), 0.867);
   backdrop-filter: blur(12px);
@@ -148,13 +139,13 @@ const Nav = styled.nav<INavProps>`
 
   left: 0;
   right: 0;
-  top: ${props => (props.isMenuOpen ? '0' : '-12%')};
-  opacity: ${props => (props.isMenuOpen ? '1' : '0')};
+  top: ${props => (props.isScrolled ? '0%' : '-12%')};
+  opacity: ${props => (props.isScrolled ? '1' : '0')};
 
   transition: top 1s ease-out,
-    opacity 1s ease-out ${props => (props.isMenuOpen ? '500ms' : '1ms')};
+    opacity 1s ease-out ${props => (props.isScrolled ? '500ms' : '1ms')};
 
-  ${isTouch() ? '&' : ':focus-within'} {
+  :focus-within {
     top: 0;
     opacity: 1;
   }
@@ -183,10 +174,10 @@ const NavLink = styled(Link)`
   color: var(--foreground);
   font-size: 1.1em;
 `
-const NavLinkWrapper = styled.div<INavLinkWrapperProps>`
+const NavLinkWrapper = styled.div<{ isMenuOpen: boolean }>`
   display: flex;
   align-items: center;
-  gap: 2em;
+  gap: 1em;
 
   @media only screen and (max-width: 768px) {
     transition: 500ms ease;
@@ -194,7 +185,7 @@ const NavLinkWrapper = styled.div<INavLinkWrapperProps>`
 
     flex-direction: column;
     position: absolute;
-    width: ${props => (!props.isMenuOpen ? `0vw;` : '100vw')};
+    width: 100vw;
     height: 100vh;
     right: 0;
     top: 0;
@@ -212,13 +203,16 @@ const NavLinkWrapper = styled.div<INavLinkWrapperProps>`
       border-bottom: none;
     }
 
-    @media only screen and (max-height: 750px) {
-      padding-top: 125px;
-      justify-content: flex-start;
-    }
+    ${props => !props.isMenuOpen && `width: 0vw;`}
+  }
+
+  @media only screen and (max-height: 500px) {
+    justify-content: flex-start;
+    padding-top: 40vh;
+    height: min-content;
   }
 `
-
+// TODO: Not centered vertically?
 const NavName = styled.p`
   color: var(--foreground);
   user-select: none;
