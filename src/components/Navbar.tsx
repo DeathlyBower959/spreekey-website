@@ -1,29 +1,81 @@
+// Packages
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Squeeze as SqueezeMenu } from 'hamburger-react'
 
+// Util
+import isTouch from '../util/isTouch'
+
+// Atoms
 import Logo from '../atoms/icons/Logo'
 
-const Navbar: React.FC<{ isLanding: boolean }> = ({ isLanding }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(!isLanding)
+// Types
+interface INavProps {
+  isMenuOpen: boolean
+  positionType: string
+}
 
+interface INavLinkWrapperProps {
+  isMenuOpen: boolean
+}
+
+const shouldHidePathURLs = [
+  { path: '/', type: 'scroll', position: 'fixed' },
+  { path: '/gallery', type: 'hover', position: 'fixed', check: 'includes' },
+]
+function getPathURLConfig(path: string) {
+  return shouldHidePathURLs.find(x =>
+    x.check === 'includes' ? path.includes(x.path) : x.path === path
+  )
+}
+
+// Main
+function Navbar() {
+  // Hooks
+  const location = useLocation()
+
+  // State
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  // Events
   function onScroll() {
-    setIsScrolled(document.documentElement.scrollTop > 100 * 5)
+    setIsMenuOpen(document.documentElement.scrollTop > 100 * 5)
+  }
+  function onMouseMove(e: MouseEvent) {
+    setIsMenuOpen(
+      e.clientY <=
+        3 * parseFloat(getComputedStyle(document.documentElement).fontSize)
+    )
   }
 
+  // Effect
   useEffect(() => {
-    if (isLanding) document.addEventListener('scroll', onScroll)
+    const shouldHideConfig = getPathURLConfig(location.pathname)
+
+    if (isTouch()) return setIsMenuOpen(false)
+    if (!shouldHideConfig) {
+      setIsMenuOpen(true)
+      return
+    }
+
+    if (shouldHideConfig.type === 'scroll')
+      document.addEventListener('scroll', onScroll)
+    else if (shouldHideConfig.type === 'hover')
+      document.addEventListener('mousemove', onMouseMove)
 
     return () => {
       document.removeEventListener('scroll', onScroll)
+      document.removeEventListener('mousemove', onMouseMove)
     }
-  }, [isLanding])
+  }, [location.pathname])
 
   return (
     <>
-      <Nav isScrolled={isScrolled}>
+      <Nav
+        isMenuOpen={isMenuOpen}
+        positionType={getPathURLConfig(location.pathname)?.position || 'sticky'}
+      >
         <NavInnerLeft as={Link} to='/' tabIndex={0}>
           <Logo color={'var(--foreground)'} />
           <NavName>[ art of spreekey ]</NavName>
@@ -33,6 +85,7 @@ const Navbar: React.FC<{ isLanding: boolean }> = ({ isLanding }) => {
             <NavLink to='/gallery'>Gallery</NavLink>
             <NavLink to='/commissions'>Commissions</NavLink>
             <NavLink to='/store'>Store</NavLink>
+            <NavLink to='/about'>About</NavLink>
           </NavLinkWrapper>
           <SqueezeWrapper>
             <SqueezeMenu
@@ -50,7 +103,7 @@ const Navbar: React.FC<{ isLanding: boolean }> = ({ isLanding }) => {
 }
 
 // Nav
-const Nav = styled.nav<{ isScrolled: boolean }>`
+const Nav = styled.nav<INavProps>`
   height: 5em;
   background-color: rgba(var(--nav-background), 0.867);
   backdrop-filter: blur(12px);
@@ -59,16 +112,19 @@ const Nav = styled.nav<{ isScrolled: boolean }>`
   justify-content: space-between;
   padding: 0 1em;
 
-  position: fixed;
+  position: ${props =>
+    // !props.isLanding ? (props.isMenuOpen ? 'sticky' : 'fixed') : 'fixed'};
+    props.positionType};
+
   left: 0;
   right: 0;
-  top: ${props => (props.isScrolled ? '0%' : '-12%')};
-  opacity: ${props => (props.isScrolled ? '1' : '0')};
+  top: ${props => (props.isMenuOpen ? '0' : '-12%')};
+  opacity: ${props => (props.isMenuOpen ? '1' : '0')};
 
   transition: top 1s ease-out,
-    opacity 1s ease-out ${props => (props.isScrolled ? '500ms' : '1ms')};
+    opacity 1s ease-out ${props => (props.isMenuOpen ? '500ms' : '1ms')};
 
-  :focus-within {
+  ${isTouch() ? '&' : ':focus-within'} {
     top: 0;
     opacity: 1;
   }
@@ -97,10 +153,10 @@ const NavLink = styled(Link)`
   color: var(--foreground);
   font-size: 1.1em;
 `
-const NavLinkWrapper = styled.div<{ isMenuOpen: boolean }>`
+const NavLinkWrapper = styled.div<INavLinkWrapperProps>`
   display: flex;
   align-items: center;
-  gap: 1em;
+  gap: 2em;
 
   @media only screen and (max-width: 768px) {
     transition: 500ms ease;
@@ -108,7 +164,7 @@ const NavLinkWrapper = styled.div<{ isMenuOpen: boolean }>`
 
     flex-direction: column;
     position: absolute;
-    width: 100vw;
+    width: ${props => (!props.isMenuOpen ? `0vw;` : '100vw')};
     height: 100vh;
     right: 0;
     top: 0;
@@ -126,16 +182,13 @@ const NavLinkWrapper = styled.div<{ isMenuOpen: boolean }>`
       border-bottom: none;
     }
 
-    ${props => !props.isMenuOpen && `width: 0vw;`}
-  }
-
-  @media only screen and (max-height: 500px) {
-    justify-content: flex-start;
-    padding-top: 40vh;
-    height: min-content;
+    @media only screen and (max-height: 750px) {
+      padding-top: 125px;
+      justify-content: flex-start;
+    }
   }
 `
-// TODO: Not centered vertically?
+
 const NavName = styled.p`
   color: var(--foreground);
   user-select: none;

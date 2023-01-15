@@ -1,3 +1,4 @@
+/* TODO: Custom font @zitra */
 /* @font-face {
   font-family: "FONTNAME";
   src: local("FILENAME"),
@@ -6,15 +7,20 @@
 
 /* Variables */
 :root {
+  /* Background */
   --background: #080a0a;
   --secondary-background: #191f1f;
+  --tertiary-background: #273030;
   --nav-background: 23, 36, 36; /* rgba(23, 36, 36) */
 
+  /* Foreground */
   --foreground: #acc3bb;
-  --secondary-foreground: #ddd;
+  --secondary-foreground: #404a46;
 
+  /* Accent */
   /* --accent: #b3934e; */
   --accent: #911a24;
+  --link-accent: #94d9c1;
 
   /* Scrollbar */
   --scrollbar-thumb: #72141c66;
@@ -54,7 +60,11 @@ body {
 #root {
   min-height: 100vh;
   width: 100%;
-  overflow-x: hidden;
+
+  /* Used to make footer always at bottom if page is too short */
+  display: flex;
+  flex-direction: column;
+  /* overflow-x: hidden; */
 }
 
 /* Scrollbar */

@@ -1,3 +1,46 @@
 {
-  "cSpell.words": ["Spreekey", "walkthrough"]
+  "cSpell.words": [
+    "Elie",
+    "kofi",
+    "QUICKHACK",
+    "Salv",
+    "Silke",
+    "Spreekey",
+    "toyhouse",
+    "truetype",
+    "zitra"
+  ],
+  "todo-tree.highlights.defaultHighlight": {
+    "type": "tag",
+    "background": "#727272",
+    "opacity": 50
+  },
+  "todo-tree.highlights.customHighlight": {
+    "TODO": {
+      "icon": "check-circle",
+      "iconColour": "#007900",
+      "foreground": "#DC8C00"
+    },
+    "FIX": {
+      "icon": "bug",
+      "iconColour": "#b83030",
+      "foreground": "#b83030"
+    },
+    "PROGRESS": {
+      "icon": "ellipsis",
+      "iconColour": "#c3b822",
+      "foreground": "#c3b822"
+    },
+    "QUICKHACK": {
+      "icon": "no-entry",
+      "iconColour": "#b039db",
+      "foreground": "#b039db"
+    }
+  },
+  "todo-tree.general.tags": ["TODO", "FIX", "PROGRESS", "QUICKHACK"],
+  "todo-tree.general.tagGroups": {
+    "FIX": ["FIX", "BUG"],
+    "PROGRESS": ["PROGRESS", "INPROGRESS"],
+    "QUICKHACK": ["QUICKHACK", "HACK", "SHORTCUT"]
+  }
 }
