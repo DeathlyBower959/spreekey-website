@@ -1,0 +1,10 @@
+{
+  "configurations": [
+    {
+      "type": "chrome",
+      "name": "React Site",
+      "request": "launch",
+      "url": "http://localhost:3000"
+    }
+  ]
+}
