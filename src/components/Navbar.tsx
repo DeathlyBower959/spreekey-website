@@ -13,7 +13,7 @@ import Logo from '../atoms/icons/Logo'
 // Types
 interface INavProps {
   isMenuOpen: boolean
-  isLanding: boolean
+  positionType: string
 }
 
 interface INavLinkWrapperProps {
@@ -21,9 +21,14 @@ interface INavLinkWrapperProps {
 }
 
 const shouldHidePathURLs = [
-  { path: '/', type: 'scroll' },
-  { path: '/gallery', type: 'hover', check: 'includes' },
+  { path: '/', type: 'scroll', position: 'fixed' },
+  { path: '/gallery', type: 'hover', position: 'fixed', check: 'includes' },
 ]
+function getPathURLConfig(path: string) {
+  return shouldHidePathURLs.find(x =>
+    x.check === 'includes' ? path.includes(x.path) : x.path === path
+  )
+}
 
 // Main
 function Navbar() {
@@ -46,11 +51,7 @@ function Navbar() {
 
   // Effect
   useEffect(() => {
-    const shouldHideConfig = shouldHidePathURLs.find(x =>
-      x.check === 'includes'
-        ? location.pathname.includes(x.path)
-        : x.path === location.pathname
-    )
+    const shouldHideConfig = getPathURLConfig(location.pathname)
 
     if (isTouch()) return setIsMenuOpen(false)
     if (!shouldHideConfig) {
@@ -71,7 +72,10 @@ function Navbar() {
 
   return (
     <>
-      <Nav isMenuOpen={isMenuOpen} isLanding={location.pathname === '/'}>
+      <Nav
+        isMenuOpen={isMenuOpen}
+        positionType={getPathURLConfig(location.pathname)?.position || 'sticky'}
+      >
         <NavInnerLeft as={Link} to='/' tabIndex={0}>
           <Logo color={'var(--foreground)'} />
           <NavName>[ art of spreekey ]</NavName>
@@ -109,7 +113,8 @@ const Nav = styled.nav<INavProps>`
   padding: 0 1em;
 
   position: ${props =>
-    props.isLanding ? (props.isMenuOpen ? 'sticky' : 'fixed') : 'fixed'};
+    // !props.isLanding ? (props.isMenuOpen ? 'sticky' : 'fixed') : 'fixed'};
+    props.positionType};
 
   left: 0;
   right: 0;
@@ -122,7 +127,6 @@ const Nav = styled.nav<INavProps>`
   ${isTouch() ? '&' : ':focus-within'} {
     top: 0;
     opacity: 1;
-    position: ${props => (props.isLanding ? 'fixed' : 'sticky')};
   }
 
   z-index: 999999;
