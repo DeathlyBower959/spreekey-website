@@ -1,10 +1,10 @@
 // Types
-interface Props {
+interface IProps {
   color?: Color
 }
 
 // Main
-const Logo: React.FC<Props> = ({ color = '#000' }) => (
+const Logo: React.FC<IProps> = ({ color = '#000' }) => (
   <svg
     height='100%'
     viewBox='0 0 704 1082'

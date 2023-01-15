@@ -1,11 +1,11 @@
 // Types
-interface Props {
+interface IProps {
   house?: Color | 'currentColor'
   text?: Color
 }
 
 // Main
-function ToyHouse({ house = 'currentColor', text = 'white' }: Props) {
+function ToyHouse({ house = 'currentColor', text = 'white' }: IProps) {
   return (
     <svg
       viewBox='0 0 148 144'

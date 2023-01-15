@@ -23,7 +23,7 @@ function App() {
         <Route path='*' element={<PageNotFound />} />
         {/* Landing Page */}
         <Route path='/' element={<Landing />} />
-        <Route path='/gallery' element={<Gallery />} />
+        <Route path='/gallery/:year?/:sector?' element={<Gallery />} />
         <Route path='/commissions' element={<Commissions />} />
         <Route path='/store' element={<Store />} />
         <Route path='/about' element={<About />} />

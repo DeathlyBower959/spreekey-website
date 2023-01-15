@@ -1,10 +1,10 @@
 // Types
-interface Props {
+interface IProps {
   color?: Color | 'currentColor'
 }
 
 // Main
-function Twitter({ color = 'currentColor' }: Props) {
+function Twitter({ color = 'currentColor' }: IProps) {
   return (
     <svg
       viewBox='0 0 236 191'

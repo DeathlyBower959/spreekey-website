@@ -3,7 +3,7 @@ import { useState } from 'react'
 import styled from 'styled-components'
 
 // Types
-interface Props {
+interface IProps {
   src: string
   alt?: string
   endBlur?: number
@@ -11,14 +11,20 @@ interface Props {
   props?: any
 }
 
-interface StyledLazyImageProps {
+interface IStyledLazyImageProps {
   endBlur: number
   endOpacity: number
   isLoaded: boolean
 }
 
 // Main
-function LazyImage({ src, alt, endBlur = 0, endOpacity = 1, ...props }: Props) {
+function LazyImage({
+  src,
+  alt,
+  endBlur = 0,
+  endOpacity = 1,
+  ...props
+}: IProps) {
   const [loaded, setLoaded] = useState(false)
 
   return (
@@ -37,7 +43,7 @@ function LazyImage({ src, alt, endBlur = 0, endOpacity = 1, ...props }: Props) {
 }
 
 // Styles
-const StyledLazyImage = styled.img<StyledLazyImageProps>`
+const StyledLazyImage = styled.img<IStyledLazyImageProps>`
   transition: opacity 500ms ease-in-out, filter 750ms ease-in-out;
   opacity: ${props => (props.isLoaded ? props.endOpacity : 0)};
   filter: blur(${props => (props.isLoaded ? props.endBlur + 'px' : '30px')});

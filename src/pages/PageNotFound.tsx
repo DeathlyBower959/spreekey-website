@@ -14,7 +14,7 @@ import MothImage from '../assets/404/Moth.png'
 import BackgroundImage from '../assets/404/Background.png'
 
 // Types
-interface LayerProps {
+interface ILayerProps {
   blend?:
     | 'normal'
     | 'multiply'
@@ -42,7 +42,10 @@ function PageNotFound() {
 
   useLayoutEffect(() => {
     const node: any = parallaxRef.current
-    if (node) new Parallax(node)
+    if (node)
+      new Parallax(node, {
+        limitY: 0,
+      })
   }, [])
 
   return (
@@ -66,7 +69,7 @@ function PageNotFound() {
 
 const SceneWrapper = styled.div`
   width: 100%;
-  height: calc(100vh);
+  height: calc(100vh - 5em);
 
   display: flex;
   justify-content: center;
@@ -76,13 +79,16 @@ const SceneWrapper = styled.div`
   filter: saturate(1.1);
 `
 
-const Layer = styled(LazyImage)<LayerProps>`
+// QUICKHACK: Make parallax not cut of image, and remove layerY restriction
+const Layer = styled(LazyImage)<ILayerProps>`
   user-select: none;
 
-  width: 115%;
-  height: 115%;
+  width: 110%;
+  height: 110%;
   margin-left: -5%;
-  margin-top: -5%;
+  /* margin-top: -5%; */
+  object-fit: cover;
+  object-position: 30% 50%;
 
   mix-blend-mode: ${props => props.blend || 'normal'};
   opacity: ${props => props.opacity || '1'};

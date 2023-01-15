@@ -1,17 +1,12 @@
 // Types
-interface Props {
+interface IProps {
   color?: Color
 }
 
 // Main
-function Instagram({ color }: Props) {
+function Instagram({ color }: IProps) {
   return (
-    <svg
-      viewBox='0 0 220 220'
-      fill='none'
-      xmlns='http://www.w3.org/2000/svg'
-      color={color}
-    >
+    <svg viewBox='0 0 220 220' fill='none' xmlns='http://www.w3.org/2000/svg'>
       <path
         d='M148 12H74c-34.242 0-62 27.758-62 62v74c0 34.242 27.758 62 62 62h74c34.242 0 62-27.758 62-62V74c0-34.242-27.758-62-62-62Z'
         stroke='url(#a)'

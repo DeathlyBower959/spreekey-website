@@ -20,7 +20,7 @@ import Twitter from '../atoms/icons/socials/Twitter'
 import ToyHouse from '../atoms/icons/socials/ToyHouse'
 
 // Types
-interface SupportLowerInnerProps {
+interface ISupportLowerInnerProps {
   target: string
   href: string
 }
@@ -67,7 +67,6 @@ function Landing() {
         <Button to='/store'>Store</Button>
         <SectionBGImage src={StoreImage} />
       </StoreSection>
-      {/* Push to secondary github branch */}
 
       <SupportSection>
         <SupportUpper target='_blank' href='https://ko-fi.com/spreekey'>
@@ -206,14 +205,14 @@ const SupportLower = styled.div`
 `
 const SupportLowerInner = styled(SupportLower).attrs({
   as: 'a',
-})<SupportLowerInnerProps>`
+})<ISupportLowerInnerProps>`
   gap: 0;
   text-decoration: none;
 `
 const SupportDivider = styled.hr`
   margin: 2em auto;
   width: 70%;
-  border-color: var(--secondary-background);
+  border: 1px solid var(--secondary-background);
 `
 const SupportText = styled.p`
   font-size: 2em;

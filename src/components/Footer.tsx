@@ -4,6 +4,7 @@ import styled from 'styled-components'
 // Atoms
 import Logo from '../atoms/icons/Logo'
 import Instagram from '../atoms/icons/socials/Instagram'
+import KoFi from '../atoms/icons/socials/Ko-Fi'
 import ToyHouse from '../atoms/icons/socials/ToyHouse'
 import Twitter from '../atoms/icons/socials/Twitter'
 
@@ -30,6 +31,7 @@ function Footer() {
               href='https://twitter.com/spreekey'
               children={<Twitter />}
             />
+            <Social href='https://ko-fi.com/spreekey' children={<KoFi />} />
           </SocialWrapper>
         </SectionWrapperRight>
       </InnerWrapper>
@@ -49,6 +51,9 @@ const FooterWrapper = styled.footer`
 
   display: flex;
   justify-content: center;
+
+  margin-top: auto;
+  justify-self: flex-end;
 `
 
 const InnerWrapper = styled.div`
@@ -101,12 +106,22 @@ const SocialWrapper = styled.div`
 
 const Social = styled.a.attrs({ target: '_blank' })`
   width: 2em;
+  height: 2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   > *,
   > * > path,
   > * > circle {
     color: var(--secondary-foreground);
     stroke: var(--secondary-foreground);
+  }
+  .kofiSVG > * {
+    fill: var(--secondary-foreground);
+  }
+  .kofiHeart {
+    fill: red;
   }
 
   #instagram-circle {

@@ -1,10 +1,10 @@
 // Types
-interface Props {
+interface IProps {
   color?: Color | 'currentColor'
 }
 
 // Main
-function Watermark({ color = 'currentColor' }: Props) {
+function Watermark({ color = 'currentColor' }: IProps) {
   return (
     <svg
       viewBox='30.829 172.788 424.185 165.19'

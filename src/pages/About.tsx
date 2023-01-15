@@ -53,13 +53,12 @@ function About() {
 
 const Wrapper = styled.div`
   width: 100vw;
-  min-height: calc(100vh - 5em);
+  min-height: calc(100vh - 10em);
 
   display: grid;
   justify-items: center;
 
   @media only screen and (max-width: 768px) {
-    min-height: calc(100vh - 5em - 3em);
     margin: 1.5em 0;
   }
 `

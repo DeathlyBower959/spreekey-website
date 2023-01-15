@@ -4,43 +4,74 @@ import styled from 'styled-components'
 import { Link, useLocation } from 'react-router-dom'
 import { Squeeze as SqueezeMenu } from 'hamburger-react'
 
+// Util
+import isTouch from '../util/isTouch'
+
 // Atoms
 import Logo from '../atoms/icons/Logo'
 
 // Types
-interface NavProps {
-  isScrolled: boolean
+interface INavProps {
+  isMenuOpen: boolean
   isLanding: boolean
 }
 
-interface NavLinkWrapperProps {
+interface INavLinkWrapperProps {
   isMenuOpen: boolean
 }
 
+const shouldHidePathURLs = [
+  { path: '/', type: 'scroll' },
+  { path: '/gallery', type: 'hover', check: 'includes' },
+]
+
 // Main
 function Navbar() {
+  // Hooks
   const location = useLocation()
-  const isLanding = location.pathname === '/'
 
+  // State
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(!isLanding)
 
+  // Events
   function onScroll() {
-    setIsScrolled(document.documentElement.scrollTop > 100 * 5)
+    setIsMenuOpen(document.documentElement.scrollTop > 100 * 5)
+  }
+  function onMouseMove(e: MouseEvent) {
+    setIsMenuOpen(
+      e.clientY <=
+        3 * parseFloat(getComputedStyle(document.documentElement).fontSize)
+    )
   }
 
+  // Effect
   useEffect(() => {
-    setIsScrolled(!isLanding)
-    if (isLanding) document.addEventListener('scroll', onScroll)
+    const shouldHideConfig = shouldHidePathURLs.find(x =>
+      x.check === 'includes'
+        ? location.pathname.includes(x.path)
+        : x.path === location.pathname
+    )
+
+    if (isTouch()) return setIsMenuOpen(false)
+    if (!shouldHideConfig) {
+      setIsMenuOpen(true)
+      return
+    }
+
+    if (shouldHideConfig.type === 'scroll')
+      document.addEventListener('scroll', onScroll)
+    else if (shouldHideConfig.type === 'hover')
+      document.addEventListener('mousemove', onMouseMove)
 
     return () => {
       document.removeEventListener('scroll', onScroll)
+      document.removeEventListener('mousemove', onMouseMove)
     }
-  }, [isLanding])
+  }, [location.pathname])
 
   return (
     <>
-      <Nav isScrolled={isScrolled} isLanding={isLanding}>
+      <Nav isMenuOpen={isMenuOpen} isLanding={location.pathname === '/'}>
         <NavInnerLeft as={Link} to='/' tabIndex={0}>
           <Logo color={'var(--foreground)'} />
           <NavName>[ art of spreekey ]</NavName>
@@ -68,7 +99,7 @@ function Navbar() {
 }
 
 // Nav
-const Nav = styled.nav<NavProps>`
+const Nav = styled.nav<INavProps>`
   height: 5em;
   background-color: rgba(var(--nav-background), 0.867);
   backdrop-filter: blur(12px);
@@ -77,20 +108,21 @@ const Nav = styled.nav<NavProps>`
   justify-content: space-between;
   padding: 0 1em;
 
-  position: ${props => (props.isScrolled ? 'sticky' : 'fixed')};
+  position: ${props =>
+    props.isLanding ? (props.isMenuOpen ? 'sticky' : 'fixed') : 'fixed'};
+
   left: 0;
   right: 0;
-  top: ${props => (props.isScrolled ? '0' : '-12%')};
-  opacity: ${props => (props.isScrolled ? '1' : '0')};
+  top: ${props => (props.isMenuOpen ? '0' : '-12%')};
+  opacity: ${props => (props.isMenuOpen ? '1' : '0')};
 
   transition: top 1s ease-out,
-    opacity 1s ease-out ${props => (props.isScrolled ? '500ms' : '1ms')};
+    opacity 1s ease-out ${props => (props.isMenuOpen ? '500ms' : '1ms')};
 
-  ${props => !props.isLanding && 'transition: none;'}
-
-  :focus-within {
+  ${isTouch() ? '&' : ':focus-within'} {
     top: 0;
     opacity: 1;
+    position: ${props => (props.isLanding ? 'fixed' : 'sticky')};
   }
 
   z-index: 999999;
@@ -117,7 +149,7 @@ const NavLink = styled(Link)`
   color: var(--foreground);
   font-size: 1.1em;
 `
-const NavLinkWrapper = styled.div<NavLinkWrapperProps>`
+const NavLinkWrapper = styled.div<INavLinkWrapperProps>`
   display: flex;
   align-items: center;
   gap: 2em;
@@ -145,12 +177,11 @@ const NavLinkWrapper = styled.div<NavLinkWrapperProps>`
     ${NavLink}:last-child {
       border-bottom: none;
     }
-  }
 
-  @media only screen and (max-height: 500px) {
-    justify-content: flex-start;
-    padding-top: 40vh;
-    height: min-content;
+    @media only screen and (max-height: 750px) {
+      padding-top: 125px;
+      justify-content: flex-start;
+    }
   }
 `
 
