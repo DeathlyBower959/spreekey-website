@@ -13,16 +13,19 @@ import Logo from '../atoms/icons/Logo'
 // Types
 interface INavProps {
   isMenuOpen: boolean
-  positionType: string
+  positionType?: string
 }
-
 interface INavLinkWrapperProps {
   isMenuOpen: boolean
 }
+interface IMenuOpenState {
+  isScrolled: boolean
+  isHovered: boolean
+}
 
 const shouldHidePathURLs = [
-  { path: '/', type: 'scroll', position: 'fixed' },
-  { path: '/gallery', type: 'hover', position: 'fixed', check: 'includes' },
+  { path: '/', type: ['scroll', 'hover'], position: 'fixed' },
+  { path: '/gallery', type: ['hover'], position: 'fixed', check: 'includes' },
 ]
 function getPathURLConfig(path: string) {
   return shouldHidePathURLs.find(x =>
@@ -36,32 +39,61 @@ function Navbar() {
   const location = useLocation()
 
   // State
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState<IMenuOpenState | boolean>({
+    isScrolled: false,
+    isHovered: false,
+  })
+  const menuOpen =
+    typeof isMenuOpen === 'object'
+      ? isMenuOpen.isHovered || isMenuOpen.isScrolled
+      : isMenuOpen
 
   // Events
   function onScroll() {
-    setIsMenuOpen(document.documentElement.scrollTop > 100 * 5)
+    setIsMenuOpen(prev => {
+      if (typeof prev === 'object')
+        return {
+          ...prev,
+          isScrolled: document.documentElement.scrollTop > 100 * 5,
+        }
+      else
+        return {
+          isHovered: false,
+          isScrolled: document.documentElement.scrollTop > 100 * 5,
+        }
+    })
   }
   function onMouseMove(e: MouseEvent) {
-    setIsMenuOpen(
-      e.clientY <=
-        3 * parseFloat(getComputedStyle(document.documentElement).fontSize)
-    )
+    setIsMenuOpen(prev => {
+      if (typeof prev === 'object')
+        return {
+          ...prev,
+          isHovered:
+            e.clientY <=
+            3 * parseFloat(getComputedStyle(document.documentElement).fontSize),
+        }
+      else
+        return {
+          isScrolled: false,
+          isHovered:
+            e.clientY <=
+            3 * parseFloat(getComputedStyle(document.documentElement).fontSize),
+        }
+    })
   }
 
   // Effect
   useEffect(() => {
+    onScroll()
+    window.scrollTo(0, 0)
     const shouldHideConfig = getPathURLConfig(location.pathname)
 
     if (isTouch()) return setIsMenuOpen(false)
-    if (!shouldHideConfig) {
-      setIsMenuOpen(true)
-      return
-    }
+    if (!shouldHideConfig) return setIsMenuOpen(true)
 
-    if (shouldHideConfig.type === 'scroll')
+    if (shouldHideConfig.type.includes('scroll'))
       document.addEventListener('scroll', onScroll)
-    else if (shouldHideConfig.type === 'hover')
+    if (shouldHideConfig.type.includes('hover'))
       document.addEventListener('mousemove', onMouseMove)
 
     return () => {
@@ -73,15 +105,15 @@ function Navbar() {
   return (
     <>
       <Nav
-        isMenuOpen={isMenuOpen}
-        positionType={getPathURLConfig(location.pathname)?.position || 'sticky'}
+        isMenuOpen={menuOpen}
+        positionType={getPathURLConfig(location.pathname)?.position}
       >
         <NavInnerLeft as={Link} to='/' tabIndex={0}>
           <Logo color={'var(--foreground)'} />
           <NavName>[ art of spreekey ]</NavName>
         </NavInnerLeft>
         <NavInnerRight>
-          <NavLinkWrapper isMenuOpen={isMenuOpen}>
+          <NavLinkWrapper isMenuOpen={menuOpen}>
             <NavLink to='/gallery'>Gallery</NavLink>
             <NavLink to='/commissions'>Commissions</NavLink>
             <NavLink to='/store'>Store</NavLink>
@@ -89,7 +121,7 @@ function Navbar() {
           </NavLinkWrapper>
           <SqueezeWrapper>
             <SqueezeMenu
-              toggled={isMenuOpen}
+              toggled={menuOpen}
               onToggle={() => setIsMenuOpen(prev => !prev)}
               color='var(--accent)'
               hideOutline={false}
@@ -112,9 +144,7 @@ const Nav = styled.nav<INavProps>`
   justify-content: space-between;
   padding: 0 1em;
 
-  position: ${props =>
-    // !props.isLanding ? (props.isMenuOpen ? 'sticky' : 'fixed') : 'fixed'};
-    props.positionType};
+  position: ${props => props.positionType || 'sticky'};
 
   left: 0;
   right: 0;
