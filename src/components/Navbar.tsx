@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { Link, useLocation } from 'react-router-dom'
 import { Squeeze as SqueezeMenu } from 'hamburger-react'
+import { ImBookmark } from 'react-icons/im'
 
 // Util
 import isTouch from '../util/isTouch'
@@ -104,6 +105,7 @@ function Navbar() {
 
   return (
     <>
+      <NavBookmark />
       <Nav
         isMenuOpen={menuOpen}
         positionType={getPathURLConfig(location.pathname)?.position}
@@ -157,9 +159,22 @@ const Nav = styled.nav<INavProps>`
   ${isTouch() ? '&' : ':focus-within'} {
     top: 0;
     opacity: 1;
+    position: sticky;
   }
 
   z-index: 999999;
+`
+const NavBookmark = styled(ImBookmark)`
+  position: fixed;
+  top: 0;
+  right: 5vw;
+  z-index: 999998;
+
+  opacity: 0.5;
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
+  ${isTouch() && 'display: none'}
 `
 const NavInner = styled.div`
   width: max-content;

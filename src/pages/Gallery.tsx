@@ -6,9 +6,12 @@ import { AiFillHome } from 'react-icons/ai'
 
 // Config
 import { YEAR_RANGE } from '../config'
+import GalleryImages from '../galleryImages.json'
+import { IGalleryImages, GalleryImagesSchema } from '../galleryImages'
 
 // Util
 import capitalize from '../util/upperCaseFirst'
+import isTouch from '../util/isTouch'
 
 function DisplayYearSidebar(sector: string = 'main') {
   let out = []
@@ -23,17 +26,20 @@ function DisplayYearSidebar(sector: string = 'main') {
 
   return out
 }
-
+const GALLERY_IMAGES = GalleryImagesSchema.parse(GalleryImages)
 // Types
-interface ISidebar {
-  isAlwaysShow: boolean
-}
 interface IYearBar {
   isHidden: boolean
 }
 interface ISelectedSelector {
   active: boolean
 }
+
+// console.log(
+//   Object.keys(GALLERY_IMAGES)
+//     .reverse()
+//     .map(year => GALLERY_IMAGES[year].alt)
+// )
 
 // Main
 function Gallery() {
@@ -65,7 +71,7 @@ function Gallery() {
 
   return (
     <Wrapper>
-      <Sidebar isAlwaysShow={!year}>
+      <Sidebar>
         <YearWrapper>{DisplayYearSidebar(sector)}</YearWrapper>
         <Link to='/gallery'>
           <HomeButton />
@@ -92,6 +98,7 @@ function Gallery() {
             </SelectedSector>
           </SelectorWrapper>
         </YearBar>
+        <GalleryWrapper></GalleryWrapper>
       </Main>
     </Wrapper>
   )
@@ -99,12 +106,13 @@ function Gallery() {
 
 const Wrapper = styled.div`
   display: flex;
-  min-height: 100vh;
   width: 100%;
+  position: relative;
+  min-height: ${isTouch() ? 'calc(100vh - 5em)' : '100vh'};
 `
 
-const Sidebar = styled.div<ISidebar>`
-  width: ${props => (props.isAlwaysShow ? '10em' : '0')};
+const Sidebar = styled.div`
+  width: 0;
   text-align: center;
   background-color: var(--secondary-background);
 
@@ -113,13 +121,18 @@ const Sidebar = styled.div<ISidebar>`
 
   transition: width 750ms ease;
   overflow: hidden;
-  height: 100vh;
+
+  height: ${isTouch() ? 'calc(100vh - 5em)' : '100vh'};
 
   display: flex;
   flex-direction: column;
 
+  position: fixed;
+  left: 0;
+  top: ${isTouch() ? '5em' : '0'};
+
   &::after {
-    display: ${props => (props.isAlwaysShow ? 'none' : 'block')};
+    display: block;
 
     content: '';
     position: fixed;
@@ -135,12 +148,25 @@ const Sidebar = styled.div<ISidebar>`
 
     transition: left 750ms ease;
   }
+
   &:hover::after {
-    left: calc(10em - 1px);
+    left: 10em;
   }
   &:hover {
     width: 10em;
   }
+
+  @media only screen and (max-width: 768px) {
+    &:hover::after {
+      left: calc(75vw);
+    }
+    &:hover {
+      width: calc(75vw);
+    }
+    padding-top: 0;
+  }
+
+  z-index: 2;
 `
 const YearWrapper = styled.div`
   display: flex;
@@ -148,18 +174,15 @@ const YearWrapper = styled.div`
 
   gap: 5em;
 
-  /* justify-content: space-around; */
-
   align-items: center;
   height: 100%;
 
-  padding: 2em 0 6em 0;
+  padding: 2em 0 2em 0;
   margin-top: 2em;
+  margin-bottom: 2em;
 
   overflow-x: hidden;
   overflow-y: auto;
-
-  flex-grow: 1;
 `
 const HomeButton = styled(AiFillHome)`
   width: 4em;
@@ -169,7 +192,6 @@ const HomeButton = styled(AiFillHome)`
 `
 
 const SidebarYear = styled(Link)`
-  rotate: 90deg;
   width: min-content;
 
   text-decoration: none;
@@ -182,11 +204,16 @@ const SidebarYear = styled(Link)`
   &:active {
     color: inherit;
   }
+
+  @media only screen and (min-width: 768px) {
+    rotate: 90deg;
+  }
 `
 
 const Main = styled.div`
   flex-grow: 1;
 `
+
 const YearBar = styled.div<IYearBar>`
   height: ${props => (props.isHidden ? '0' : '10em')};
   background-color: var(--tertiary-background);
@@ -198,6 +225,7 @@ const YearBar = styled.div<IYearBar>`
   text-align: center;
   flex-direction: column;
 `
+const GalleryWrapper = styled.div``
 const SelectorWrapper = styled.div`
   display: flex;
   gap: 1em;

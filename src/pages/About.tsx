@@ -7,6 +7,7 @@ import AboutImage from '../assets/background/about-hero.jpg'
 // Atoms
 import LazyImage from '../atoms/LazyImage'
 
+// FIX: Zooming in causes the wrappers to overlay with the footer, overflow the body, etc.
 function About() {
   return (
     <Wrapper>

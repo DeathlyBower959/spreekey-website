@@ -35,12 +35,24 @@
       "icon": "no-entry",
       "iconColour": "#b039db",
       "foreground": "#b039db"
+    },
+    "IMPORTANT": {
+      "icon": "bell",
+      "iconColour": "#f00",
+      "foreground": "#f00"
     }
   },
-  "todo-tree.general.tags": ["TODO", "FIX", "PROGRESS", "QUICKHACK"],
+  "todo-tree.general.tags": [
+    "TODO",
+    "FIX",
+    "PROGRESS",
+    "QUICKHACK",
+    "IMPORTANT"
+  ],
   "todo-tree.general.tagGroups": {
     "FIX": ["FIX", "BUG"],
     "PROGRESS": ["PROGRESS", "INPROGRESS"],
-    "QUICKHACK": ["QUICKHACK", "HACK", "SHORTCUT"]
+    "QUICKHACK": ["QUICKHACK", "HACK", "SHORTCUT"],
+    "IMPORTANT": ["IMPORTANT"]
   }
 }
