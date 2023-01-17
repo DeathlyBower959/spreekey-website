@@ -1,37 +1,80 @@
 {
   "2023": {
-    "main": [""],
-    "sketches": [""],
-    "alt": [""]
+    "main": [
+      "https://media.discordapp.net/attachments/1060077754982342686/1060077831448707143/Untitled135_20230104010854.png",
+      "https://media.discordapp.net/attachments/1060077754982342686/1063298850057625610/Untitled_444.png",
+      "https://media.discordapp.net/attachments/1060077754982342686/1064644724910202920/Untitled_454.png"
+    ],
+    "sketches": [
+      "https://media.discordapp.net/attachments/1060077793125355530/1063942031992438854/Untitled_442.png"
+    ],
+    "alt": []
   },
   "2022": {
-    "main": [""],
-    "sketches": [""],
-    "alt": [""]
+    "main": [
+      "https://media.discordapp.net/attachments/982673827953778758/1058183792281518191/Untitled_396.png",
+      "https://media.discordapp.net/attachments/982673827953778758/1057942766488928296/Untitled_391.png",
+      "https://media.discordapp.net/attachments/982673827953778758/1057942700613193758/Untitled_395.png",
+      "https://media.discordapp.net/attachments/982673827953778758/1057419351810121859/Untitled_388.png",
+      "https://media.discordapp.net/attachments/982673827953778758/1056315378751504474/Untitled_360.PNG",
+      "https://media.discordapp.net/attachments/982673827953778758/1056314759152160769/Untitled-3.PNG"
+    ],
+    "sketches": [
+      "https://media.discordapp.net/attachments/1060077793125355530/1063942031992438854/Untitled_442.png",
+      "https://media.discordapp.net/attachments/993742569538326578/1057942744263307335/Untitled_393.png",
+      "https://media.discordapp.net/attachments/993742569538326578/1057942744036823070/IMG_D009B9C3CFA4-1.jpg",
+      "https://media.discordapp.net/attachments/993742569538326578/1056322703268773959/Untitled_699.PNG",
+      "https://media.discordapp.net/attachments/993742569538326578/1056322703092621332/Untitled_691.PNG"
+    ],
+    "alt": [
+      "https://media.discordapp.net/attachments/982675778095419392/1058124714251407420/66092B41-E0DD-41A9-9B1E-574EE5AD512D.jpg",
+      "https://media.discordapp.net/attachments/982675778095419392/1058536449936474213/Untitled_409.png",
+      "https://media.discordapp.net/attachments/982675778095419392/1056315432879014020/Untitled_381.PNG",
+      "https://media.discordapp.net/attachments/982675778095419392/1056315165152399461/IMG_8482.PNG"
+    ]
   },
   "2021": {
-    "main": [""],
-    "sketches": [""],
-    "alt": [""]
+    "main": [
+      "https://media.discordapp.net/attachments/982678423979827200/1058594090763169844/Untitled_46.png"
+    ],
+    "sketches": [
+      "https://media.discordapp.net/attachments/993743117012447354/993747097968984105/Untitled_257.PNG"
+    ],
+    "alt": [
+      "https://media.discordapp.net/attachments/982678451842580510/993739281183015032/Untitled_280.PNG"
+    ]
   },
   "2020": {
-    "main": [""],
-    "sketches": [""],
-    "alt": [""]
+    "main": [
+      "https://media.discordapp.net/attachments/993666591784968234/1031286367507980378/IMG_8132.png"
+    ],
+    "sketches": [
+      "https://media.discordapp.net/attachments/993743437750861874/993743544185524244/42024A9C-F0F9-428D-AC21-7B370657A08B_1.PNG"
+    ],
+    "alt": [
+      "https://media.discordapp.net/attachments/993666615122067476/993741013581565952/IMG_4828.JPG"
+    ]
   },
   "2019": {
-    "main": [""],
-    "sketches": [""],
-    "alt": [""]
+    "main": [
+      "https://media.discordapp.net/attachments/993741123942088734/993741617003495424/58040E4A-777B-4BC1-8D9C-DDEA7985F3B3_1.PNG"
+    ],
+    "alt": [
+      "https://media.discordapp.net/attachments/993741150198448189/993742071246626816/6AEED6A2-E59D-4C85-AD6D-142E8F8DF64D.jpg"
+    ]
   },
   "2018": {
-    "main": [""],
-    "sketches": [""],
-    "alt": [""]
+    "main": [
+      "https://media.discordapp.net/attachments/993742263911981066/993742394493247529/IMG_0006.PNG"
+    ],
+    "alt": []
   },
   "2017": {
-    "main": [""],
-    "sketches": [""],
-    "alt": [""]
+    "main": [
+      "https://media.discordapp.net/attachments/993742188477423667/993742452726968350/IMG_0238.PNG"
+    ],
+    "alt": [
+      "https://media.discordapp.net/attachments/982675778095419392/1056315434032451634/Untitled_374.PNG"
+    ]
   }
 }

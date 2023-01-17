@@ -7,7 +7,6 @@ import AboutImage from '../assets/background/about-hero.jpg'
 // Atoms
 import LazyImage from '../atoms/LazyImage'
 
-// FIX: Zooming in causes the wrappers to overlay with the footer, overflow the body, etc.
 function About() {
   return (
     <Wrapper>
@@ -54,7 +53,7 @@ function About() {
 
 const Wrapper = styled.div`
   width: 100vw;
-  min-height: calc(100vh - 10em);
+  min-height: calc(100vh - 5em);
 
   display: grid;
   justify-items: center;
@@ -65,20 +64,20 @@ const Wrapper = styled.div`
 `
 
 const Image = styled(LazyImage)`
-  width: 500px;
-  min-width: 600px;
-  height: 65vh;
+  width: 600px;
+  height: 800px;
 
   object-fit: cover;
 
   margin-top: 8rem;
-  transform: translateX(-200px);
+  /* transform: translateX(-200px); */
+  margin-right: 200px;
 
   @media only screen and (max-width: 768px) {
     width: 95vw;
-    min-width: auto;
-    transform: none;
     margin-top: 3rem;
+
+    margin-right: 0;
   }
 
   grid-row: 1;
@@ -94,12 +93,13 @@ const TextWrapper = styled.div`
     rgba(0, 0, 0, 0.25) -4px -3px 6px;
 
   width: 500px;
+  height: 800px;
 
-  min-height: min-content;
-  height: 65vh;
-
-  margin-top: 8rem;
-  transform: translateX(200px) translateY(50px);
+  /* margin-top: 8rem; */
+  /* transform: translateX(200px) translateY(50px); */
+  margin-left: 200px;
+  margin-top: calc(8rem + 50px);
+  margin-bottom: 8rem;
 
   font-size: 1.2em;
 
@@ -109,14 +109,14 @@ const TextWrapper = styled.div`
 
   @media only screen and (max-width: 768px) {
     width: 90vw;
-    transform: none;
     height: min-content;
     min-width: 260px;
     border-width: 15px;
     padding: 1.5em;
-    margin-top: 20rem;
     font-size: 1em;
-    margin-top: 13rem;
+
+    margin-left: 0;
+    margin-bottom: 0;
   }
 
   > * {

@@ -3,17 +3,27 @@ import styled from 'styled-components'
 import { useRef, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AiFillHome } from 'react-icons/ai'
+import Masonry from 'react-masonry-css'
+import { motion } from 'framer-motion'
 
 // Config
 import { YEAR_RANGE } from '../config'
 import GalleryImages from '../galleryImages.json'
-import { IGalleryImages, GalleryImagesSchema } from '../galleryImages'
+import { GalleryImagesSchema, IDiscordImageURL } from '../galleryImages'
+
+// Atoms
+import LazyGalleryImage from '../atoms/LazyGalleryImage'
 
 // Util
 import capitalize from '../util/upperCaseFirst'
 import isTouch from '../util/isTouch'
+import {
+  ScrollPosition,
+  trackWindowScroll,
+} from 'react-lazy-load-image-component'
 
-function DisplayYearSidebar(sector: string = 'main') {
+const GALLERY_IMAGES = GalleryImagesSchema.parse(GalleryImages)
+function RenderYearSidebar(sector: string = 'main') {
   let out = []
 
   for (let i = YEAR_RANGE[1]; i >= YEAR_RANGE[0]; i--) {
@@ -26,79 +36,123 @@ function DisplayYearSidebar(sector: string = 'main') {
 
   return out
 }
-const GALLERY_IMAGES = GalleryImagesSchema.parse(GalleryImages)
+function RenderGalleryImages(
+  yearFilter: string | undefined,
+  sectorFilter: string | undefined,
+  scrollPosition: ScrollPosition
+) {
+  let index = -1
+  return Object.keys(GALLERY_IMAGES)
+    .filter(x => (yearFilter ? x === yearFilter : true))
+    .reverse()
+    .map((year, yearIdx) =>
+      Object.keys(GALLERY_IMAGES[year as IYearKey])
+        .filter(x => (sectorFilter ? x === sectorFilter : true))
+        .map((sector, sectorIdx) =>
+          GALLERY_IMAGES[year as IYearKey][sector as ISectorKey]?.map(
+            (imageURL, imageURLIdx) => {
+              if (!imageURL || !imageURL.match(/([0-9]+)\/([0-9]+)/)?.[0])
+                return console.error('Failed to load: ' + imageURL)
+
+              index++
+              return (
+                <LazyGalleryImage
+                  // delay={yearIdx + sectorIdx + imageURLIdx}
+                  scrollPosition={scrollPosition}
+                  delay={index}
+                  year={parseInt(year)}
+                  sector={sector}
+                  key={imageURL.match(/([0-9]+)\/([0-9]+)/)?.[0]}
+                  src={imageURL as IDiscordImageURL}
+                />
+              )
+            }
+          )
+        )
+    )
+}
+
 // Types
+interface IProps {
+  scrollPosition: ScrollPosition
+}
 interface IYearBar {
   isHidden: boolean
 }
-interface ISelectedSelector {
-  active: boolean
-}
-
-// console.log(
-//   Object.keys(GALLERY_IMAGES)
-//     .reverse()
-//     .map(year => GALLERY_IMAGES[year].alt)
-// )
+type IYearKey = keyof typeof GALLERY_IMAGES
+type ISectorKey = keyof typeof GALLERY_IMAGES['2023']
 
 // Main
-function Gallery() {
+function Gallery({ scrollPosition }: IProps) {
   // Hooks
   const navigate = useNavigate()
-  const { year, sector } = useParams()
+  const { year: yearFilter, sector: sectorFilter } = useParams()
 
   // State
   const dropdownRef = useRef<HTMLSelectElement>(null)
 
   // Effect
   useEffect(() => {
-    if (!sector || !dropdownRef.current) return
+    if (!sectorFilter || !dropdownRef.current) return
 
-    if (sector === 'main' || sector === 'alt' || sector === 'sketches')
-      dropdownRef.current.value = capitalize(sector)
-    else navigate(`/gallery/${year}/main`)
+    if (
+      sectorFilter === 'main' ||
+      sectorFilter === 'alt' ||
+      sectorFilter === 'sketches'
+    )
+      dropdownRef.current.value = capitalize(sectorFilter)
+    else navigate(`/gallery/${yearFilter}/main`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sector])
+  }, [sectorFilter])
 
   // Events
   function handleLinkClick(e: React.MouseEvent<HTMLHeadingElement>) {
     navigate(
-      `/gallery/${year || YEAR_RANGE[1]}/${
-        e.currentTarget.innerHTML.toLowerCase() || 'main'
+      `/gallery/${yearFilter || YEAR_RANGE[1]}/${
+        e.currentTarget.innerText.toLowerCase() || 'main'
       }`
     )
   }
 
+  // TODO: Hover/Click image
   return (
     <Wrapper>
       <Sidebar>
-        <YearWrapper>{DisplayYearSidebar(sector)}</YearWrapper>
+        <YearWrapper>{RenderYearSidebar(sectorFilter)}</YearWrapper>
         <Link to='/gallery'>
           <HomeButton />
         </Link>
       </Sidebar>
       <Main>
-        <YearBar isHidden={!year}>
-          <SelectedYear>{year || ''}</SelectedYear>
+        <YearBar isHidden={!yearFilter}>
+          <SelectedYear>{yearFilter || ''}</SelectedYear>
           <SelectorWrapper>
-            <SelectedSector
-              active={sector === 'main'}
-              onClick={handleLinkClick}
-            >
+            <SelectedSector onClick={handleLinkClick}>
               Main
+              {sectorFilter === 'main' && <ActiveUnderline />}
             </SelectedSector>
-            <SelectedSector
-              active={sector === 'sketches'}
-              onClick={handleLinkClick}
-            >
+            <SelectedSector onClick={handleLinkClick}>
               Sketches
+              {sectorFilter === 'sketches' && <ActiveUnderline />}
             </SelectedSector>
-            <SelectedSector active={sector === 'alt'} onClick={handleLinkClick}>
+            <SelectedSector onClick={handleLinkClick}>
               Alt
+              {sectorFilter === 'alt' && <ActiveUnderline />}
             </SelectedSector>
           </SelectorWrapper>
         </YearBar>
-        <GalleryWrapper></GalleryWrapper>
+        <GalleryWrapper
+          breakpointCols={{
+            default: 4,
+            1500: 3,
+            900: 2,
+            650: 1,
+          }}
+          className='gallery-masonry-grid'
+          columnClassName='gallery-masonry-grid_column'
+        >
+          {RenderGalleryImages(yearFilter, sectorFilter, scrollPosition)}
+        </GalleryWrapper>
       </Main>
     </Wrapper>
   )
@@ -212,6 +266,9 @@ const SidebarYear = styled(Link)`
 
 const Main = styled.div`
   flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
 `
 
 const YearBar = styled.div<IYearBar>`
@@ -225,7 +282,21 @@ const YearBar = styled.div<IYearBar>`
   text-align: center;
   flex-direction: column;
 `
-const GalleryWrapper = styled.div``
+const GalleryWrapper = styled(Masonry)`
+  display: flex;
+  margin-left: calc(var(--masonry-gutter-size) * -1);
+  width: 100%;
+
+  & > div {
+    padding-left: var(--masonry-gutter-size);
+    background-clip: padding-box;
+  }
+
+  & > div > img {
+    margin-bottom: var(--masonry-gutter-size);
+  }
+`
+
 const SelectorWrapper = styled.div`
   display: flex;
   gap: 1em;
@@ -233,11 +304,18 @@ const SelectorWrapper = styled.div`
 const SelectedYear = styled.h1`
   font-size: 4em;
 `
-const SelectedSector = styled.h3<ISelectedSelector>`
+const SelectedSector = styled.h3`
   cursor: pointer;
-
-  text-decoration: ${props => (props.active ? 'underline' : 'none')};
-  text-decoration-thickness: 3px;
+  position: relative;
 `
+const ActiveUnderline = styled(motion.div).attrs({
+  layoutId: 'gallery-underline',
+})`
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
 
-export default Gallery
+  background-color: var(--foreground);
+`
+export default trackWindowScroll(Gallery)

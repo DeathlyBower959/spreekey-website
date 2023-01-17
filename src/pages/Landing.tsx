@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
 // Assets
+// TODO: Optimize image loading/replace with zitra artwork
 import HeroImage from '../assets/background/hero-section.jpg'
 import GalleryImage from '../assets/background/gallery-section.jpg'
 import CommissionsImage from '../assets/background/commissions-section.jpg'
