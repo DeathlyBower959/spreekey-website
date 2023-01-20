@@ -1,0 +1,43 @@
+name: Get Gallery Images
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+  workflow_dispatch:
+  push:
+    branches: ['production']
+
+jobs:
+  get-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install packages
+        run: cd .action && npm i
+
+      - name: Create .env
+        run: |
+          touch .action/.env
+          echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} >> .action/.env
+
+      - name: Run TS Action
+        run: cd .action && npm run start
+
+      - name: Check for modified files
+        id: git-check
+        run: echo ::set-output name=modified::$([ -z "`git status --porcelain`" ] && echo "false" || echo "true")
+      - name: Commit latest release versions
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add src/galleryImages.json
+          git commit -m "New Images"
+          git push

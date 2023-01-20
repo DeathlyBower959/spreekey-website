@@ -5,41 +5,46 @@ export interface IGalleryImages {
 }
 
 export interface IArtYear {
-  main?: IDiscordImageURL[]
-  alt?: IDiscordImageURL[]
-  sketches?: IDiscordImageURL[]
+  main?: IArt[]
+  alt?: IArt[]
+  sketches?: IArt[]
+}
+
+export interface IArt {
+  url: IDiscordImageURL
+  month?: number
+  day?: number
 }
 
 export type IDiscordImageURL =
-  `https://cdn.discordapp.com/attachments/${number}/${number}/${string}`
+  `https://media.discordapp.net/attachments/${number}/${number}/${string}`
 
 export const DiscordImageURLRegex =
-  /https:\/\/cdn.discordapp.com\/attachments\/([0-9]+)\/([0-9]+)\/[A-z,0-9,-]+.[A-z]+/
+  /https:\/\/media.discordapp.net\/attachments\/([0-9]+)\/([0-9]+)\/[A-z,0-9,-]+.[A-z]+/
 
-export const YearSchema = z.object({
-  main: z.array(z.string().regex(DiscordImageURLRegex)).optional(),
-  alt: z.array(z.string().regex(DiscordImageURLRegex)).optional(),
-  sketches: z.array(z.string().regex(DiscordImageURLRegex)).optional(),
+export const ArtSchema = z.object({
+  url: z.string().regex(DiscordImageURLRegex),
+  month: z.number().optional(),
+  day: z.number().optional(),
+})
+
+export const ArtYearSchema = z.object({
+  main: z.array(ArtSchema).optional(),
+  alt: z.array(ArtSchema).optional(),
+  sketches: z.array(ArtSchema).optional(),
 })
 
 // IMPORTANT: UPDATE WHEN YEAR_RANGE IS CHANGED
 export const GalleryImagesSchema = z.object({
-  '2023': YearSchema,
-  '2022': YearSchema,
-  '2021': YearSchema,
-  '2020': YearSchema,
-  '2019': YearSchema,
-  '2018': YearSchema,
-  '2017': YearSchema,
+  '2023': ArtYearSchema,
+  '2022': ArtYearSchema,
+  '2021': ArtYearSchema,
+  '2020': ArtYearSchema,
+  '2019': ArtYearSchema,
+  '2018': ArtYearSchema,
+  '2017': ArtYearSchema,
 })
 
 // TODO: Discord thing
 //  - media.discordapp.net not cdn.discordapp.com
 //  - both ?width=&height=
-
-// TODO: Make TS discord.js script
-//  Run on github action every day
-//  - Login with bot token
-//  - Loop through categories/channels
-//  - Grab images
-//  - Add to json file

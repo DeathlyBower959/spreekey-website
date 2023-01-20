@@ -1,6 +1,6 @@
 // Packages
 import styled from 'styled-components'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AiFillHome } from 'react-icons/ai'
 import Masonry from 'react-masonry-css'
@@ -45,25 +45,31 @@ function RenderGalleryImages(
   return Object.keys(GALLERY_IMAGES)
     .filter(x => (yearFilter ? x === yearFilter : true))
     .reverse()
-    .map((year, yearIdx) =>
+    .map(year =>
       Object.keys(GALLERY_IMAGES[year as IYearKey])
         .filter(x => (sectorFilter ? x === sectorFilter : true))
-        .map((sector, sectorIdx) =>
+        .map(sector =>
           GALLERY_IMAGES[year as IYearKey][sector as ISectorKey]?.map(
-            (imageURL, imageURLIdx) => {
-              if (!imageURL || !imageURL.match(/([0-9]+)\/([0-9]+)/)?.[0])
-                return console.error('Failed to load: ' + imageURL)
+            imageData => {
+              if (!imageData || !imageData.url.match(/([0-9]+)\/([0-9]+)/)?.[0])
+                return console.error('Failed to load: ' + imageData)
+
+              const ID = imageData.url.match(
+                /([0-9]+)\/([0-9]+)/
+              )?.[0] as string
 
               index++
               return (
                 <LazyGalleryImage
-                  // delay={yearIdx + sectorIdx + imageURLIdx}
-                  scrollPosition={scrollPosition}
                   delay={index}
+                  scrollPosition={scrollPosition}
                   year={parseInt(year)}
+                  month={imageData.month}
+                  day={imageData.day}
                   sector={sector}
-                  key={imageURL.match(/([0-9]+)\/([0-9]+)/)?.[0]}
-                  src={imageURL as IDiscordImageURL}
+                  key={ID}
+                  ID={ID}
+                  src={imageData.url as IDiscordImageURL}
                 />
               )
             }
@@ -86,7 +92,9 @@ type ISectorKey = keyof typeof GALLERY_IMAGES['2023']
 function Gallery({ scrollPosition }: IProps) {
   // Hooks
   const navigate = useNavigate()
-  const { year: yearFilter, sector: sectorFilter } = useParams()
+  let { year: yearFilter, sector: sectorFilter, imageId } = useParams()
+  // if (!yearFilter?.match(/[0-9]{4}/) || (parseInt(yearFilter) >= YEAR_RANGE[0])) yearFilter = undefined
+  // console.log(!yearFilter?.match(/[0-9]{4}/))
 
   // State
   const dropdownRef = useRef<HTMLSelectElement>(null)
@@ -114,7 +122,8 @@ function Gallery({ scrollPosition }: IProps) {
     )
   }
 
-  // TODO: Hover/Click image
+  // TODO: Hover/Click image open preview/carousel
+  // TODO: Optimize images???
   return (
     <Wrapper>
       <Sidebar>
@@ -153,6 +162,9 @@ function Gallery({ scrollPosition }: IProps) {
         >
           {RenderGalleryImages(yearFilter, sectorFilter, scrollPosition)}
         </GalleryWrapper>
+        {/* <Carousel>
+
+        </Carousel> */}
       </Main>
     </Wrapper>
   )
@@ -296,7 +308,6 @@ const GalleryWrapper = styled(Masonry)`
     margin-bottom: var(--masonry-gutter-size);
   }
 `
-
 const SelectorWrapper = styled.div`
   display: flex;
   gap: 1em;
