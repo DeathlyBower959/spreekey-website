@@ -37,6 +37,7 @@ async function PopulateMessages(
         messages.forEach(msg => {
           if (!msg.attachments.first()?.proxyURL) return
 
+          // TODO: Dont put media.discordapp.net (will compress json file)
           if (year >= 2023)
             outMessages.push({
               url: msg.attachments.first()?.proxyURL as IDiscordImageURL,
