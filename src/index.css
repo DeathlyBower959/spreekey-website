@@ -135,3 +135,29 @@ body {
   background-color: var(--scrollbar-thumb-hover);
 }
 
+/* InfoGroup Container Query */
+@container InfoBar (width < 500px) {
+  /* Used for specificity */
+  .infoGroup.infoGroup {
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .infoBar.infoBar {
+    height: 0;
+    position: absolute;
+    overflow: hidden;
+    bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    flex-direction: column;
+
+    transition: height 500ms ease-out, padding 500ms ease-out;
+  }
+
+  .infoBar.infoBar:focus-within {
+    height: 15em;
+    padding: 1.5em 0;
+  }
+}
+

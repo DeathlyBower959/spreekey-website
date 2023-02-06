@@ -1,9 +1,17 @@
 {
   "configurations": [
     {
-      "type": "chrome",
-      "name": "React Site",
+      "name": "Action",
       "request": "launch",
+      "type": "node-terminal",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/.action"
+    },
+    {
+      "type": "chrome",
+      "name": "Web",
+      "request": "launch",
+      "preLaunchTask": "Launch React",
       "url": "http://localhost:3000"
     }
   ]
