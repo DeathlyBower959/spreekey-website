@@ -70,10 +70,13 @@ function LazyGalleryImage({
     favoriteToggle();
     localStorage.setItem('spreekey-has_double_tapped_to_favorite', 'true');
   }
+  function openExpandedView() {
+    if (!location.pathname.match(/c\/[0-9]+-[0-9]+/)?.[0])
+      navigate(`c/${ID.split('/').join('-')}`);
+  }
   function handleClick() {
     if (isMobile) setIsOverlayOpen(prev => !prev);
-    else if (!location.pathname.match(/c\/[0-9]+-[0-9]+/)?.[0])
-      navigate(`c/${ID.split('/').join('-')}`);
+    else openExpandedView();
   }
 
   return (
@@ -114,7 +117,7 @@ function LazyGalleryImage({
           }}
         >
           <MobileOnlyView>
-            <OpenLargerOverlay onClick={handleClick}>+</OpenLargerOverlay>
+            <OpenLargerOverlay onClick={openExpandedView}>+</OpenLargerOverlay>
           </MobileOnlyView>
           <SectorOverlay>{capitalize(sector)}</SectorOverlay>
           <DateOverlay>
@@ -175,7 +178,8 @@ const DateOverlay = styled(InnerOverlay)`
   left: 0.5em;
   top: 0.5em;
 `;
-const OpenLargerOverlay = styled.button`
+// TODO: Accessibilty
+const OpenLargerOverlay = styled.div`
   font-size: 2.5em;
   position: absolute;
 
