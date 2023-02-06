@@ -23,6 +23,11 @@ function App() {
         <Route path='*' element={<PageNotFound />} />
         {/* Landing Page */}
         <Route path='/' element={<Landing />} />
+        <Route path='/gallery/favorites' element={<Gallery isFavoritesURL />} />
+        <Route
+          path='/gallery/:year?/:sector?/c/:imageId?'
+          element={<Gallery />}
+        />
         <Route path='/gallery/:year?/:sector?' element={<Gallery />} />
         <Route path='/commissions' element={<Commissions />} />
         <Route path='/store' element={<Store />} />

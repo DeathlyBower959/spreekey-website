@@ -13,6 +13,7 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <BrowserRouter>
+      <div id='background' />
       <App />
     </BrowserRouter>
   </React.StrictMode>

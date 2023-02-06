@@ -4,7 +4,7 @@ interface IProps {
 }
 
 // Main
-const Logo: React.FC<IProps> = ({ color = '#000' }) => (
+const Logo = ({ color = '#000' }: IProps) => (
   <svg
     height='100%'
     viewBox='0 0 704 1082'

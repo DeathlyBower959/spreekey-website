@@ -20,7 +20,7 @@ interface IStyledLazyImageProps {
 // Main
 function LazyImage({
   src,
-  alt,
+  alt = '',
   endBlur = 0,
   endOpacity = 1,
   ...props

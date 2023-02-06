@@ -3,12 +3,11 @@ import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { Link, useLocation } from 'react-router-dom'
 import { Squeeze as SqueezeMenu } from 'hamburger-react'
-
-// Util
-import isTouch from '../util/isTouch'
+import { ImBookmark } from 'react-icons/im'
 
 // Atoms
 import Logo from '../atoms/icons/Logo'
+import { isMobile } from 'react-device-detect'
 
 // Types
 interface INavProps {
@@ -88,7 +87,7 @@ function Navbar() {
     window.scrollTo(0, 0)
     const shouldHideConfig = getPathURLConfig(location.pathname)
 
-    if (isTouch()) return setIsMenuOpen(false)
+    if (isMobile) return setIsMenuOpen(false)
     if (!shouldHideConfig) return setIsMenuOpen(true)
 
     if (shouldHideConfig.type.includes('scroll'))
@@ -104,6 +103,7 @@ function Navbar() {
 
   return (
     <>
+      <NavBookmark />
       <Nav
         isMenuOpen={menuOpen}
         positionType={getPathURLConfig(location.pathname)?.position}
@@ -152,14 +152,27 @@ const Nav = styled.nav<INavProps>`
   opacity: ${props => (props.isMenuOpen ? '1' : '0')};
 
   transition: top 1s ease-out,
-    opacity 1s ease-out ${props => (props.isMenuOpen ? '500ms' : '1ms')};
+    opacity 250ms ease-out ${props => (props.isMenuOpen ? '500ms' : '1ms')};
 
-  ${isTouch() ? '&' : ':focus-within'} {
+  ${isMobile ? '&' : ':focus-within'} {
     top: 0;
     opacity: 1;
+    position: sticky;
   }
 
   z-index: 999999;
+`
+const NavBookmark = styled(ImBookmark)`
+  position: fixed;
+  top: 0;
+  right: 5vw;
+  z-index: 999998;
+
+  opacity: 0.5;
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
+  ${isMobile && 'display: none'}
 `
 const NavInner = styled.div`
   width: max-content;
