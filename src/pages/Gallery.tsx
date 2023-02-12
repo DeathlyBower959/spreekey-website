@@ -1,7 +1,7 @@
 // Packages
 import styled from 'styled-components';
 import React, { useRef, useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AiFillHome } from 'react-icons/ai';
 import Masonry from 'react-masonry-css';
 import { motion } from 'framer-motion';
@@ -36,6 +36,7 @@ import useLocalStorage from '../hooks/useLocalStorage';
 // Util
 import capitalize from '../util/upperCaseFirst';
 import limitNumberWithinRange from '../util/limitNum';
+import Loader from '../atoms/loaders/Loader';
 
 const GALLERY_IMAGES = GalleryImagesSchema.parse(
   GalleryImages
@@ -158,24 +159,37 @@ interface FullIArt extends IArt {
   ID: IDiscordImageID;
   ratio: [number, number];
 }
+interface IImageFocusOverlayWrapper {
+  isShown: boolean;
+}
 type ISectorKey = keyof typeof GALLERY_IMAGES['2023'];
 
 // Main
 function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
   // Hooks
   const navigate = useNavigate();
+  const location = useLocation();
   const [favoriteArt, setFavoriteArt] = useLocalStorage<IDiscordImagePath[]>(
     'favorited_art',
     []
   );
 
   let { year: yearFilter, sector: sectorFilter, imageId } = useParams();
-  // if (!yearFilter?.match(/[0-9]{4}/) || (parseInt(yearFilter) >= YEAR_RANGE[0])) yearFilter = undefined
-  // console.log(!yearFilter?.match(/[0-9]{4}/))
 
   // State
   const dropdownRef = useRef<HTMLSelectElement>(null);
   const [fetchedArt, setFetchedArt] = useState<FullIArt | null>(null);
+
+  const sectorKeys: ISectorKey[] = ['alt', 'main', 'sketches'];
+  if (
+    !yearFilter?.match(/^\d{4}$/)?.[0] ||
+    parseInt(yearFilter) < YEAR_RANGE[0] ||
+    parseInt(yearFilter) > YEAR_RANGE[1] ||
+    !sectorKeys.includes(sectorFilter as ISectorKey)
+  ) {
+    yearFilter = undefined;
+    sectorFilter = undefined;
+  }
 
   useEffect(() => {
     if (!imageId) setFetchedArt(null);
@@ -286,7 +300,13 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
           )}
         </MasonryGallery>
 
-        <ImageFocusOverlayWrapper isShown={fetchedArt !== null}>
+        <ImageFocusOverlayWrapper
+          isShown={fetchedArt !== null}
+          onClick={() =>
+            navigate(location.pathname.replace(/[0-9]+-[0-9]+/, ''))
+          }
+        >
+          {fetchedArt !== null && <Loader />}
           <FocusedGalleryImage
             year={fetchedArt?.year}
             month={fetchedArt?.month}
@@ -513,7 +533,7 @@ const ActiveUnderline = styled(motion.div).attrs({
 `;
 
 // Image Focus Overlay
-const ImageFocusOverlayWrapper = styled.div<{ isShown: boolean }>`
+const ImageFocusOverlayWrapper = styled.div<IImageFocusOverlayWrapper>`
   opacity: 0;
   pointer-events: none;
 

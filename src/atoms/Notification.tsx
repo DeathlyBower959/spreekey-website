@@ -4,6 +4,10 @@ import styled from 'styled-components';
 interface IProps {
   children: JSX.Element | string;
 }
+interface INotificationWrapper {
+  isOpen: boolean;
+}
+
 function Notification({ children }: IProps) {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -15,7 +19,7 @@ function Notification({ children }: IProps) {
   );
 }
 
-const NotificationWrapper = styled.div<{ isOpen: boolean }>`
+const NotificationWrapper = styled.div<INotificationWrapper>`
   position: fixed;
   left: 0;
   right: 0;
