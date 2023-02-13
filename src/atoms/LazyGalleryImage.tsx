@@ -18,8 +18,8 @@ import capitalize from '../util/upperCaseFirst';
 import { IDiscordImageURL } from '../galleryImages';
 import { useLocation } from 'react-router';
 interface IProps {
-  src: IDiscordImageURL;
-  initial: IDiscordImageURL;
+  src: IDiscordImageURL | null;
+  initial: IDiscordImageURL | null;
   alt?: string;
   year?: number;
   sector?: string;
@@ -97,8 +97,8 @@ function LazyGalleryImage({
             minHeight: isLoaded ? 0 : '25vh',
           }}
           afterLoad={() => setIsLoaded(true)}
-          src={src}
-          placeholderSrc={initial}
+          src={src || ''}
+          placeholderSrc={initial || ''}
           alt={alt}
           scrollPosition={scrollPosition}
           threshold={400}

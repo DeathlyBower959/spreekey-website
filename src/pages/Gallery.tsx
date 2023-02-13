@@ -17,10 +17,12 @@ import FocusedGalleryImage from '../atoms/FocusedGalleryImage';
 import { IMAGE_COMPRESSION, YEAR_RANGE } from '../config';
 import GalleryImages from '../galleryImages.json';
 import {
-  DiscordImagePathID,
+  DiscordImagePathIDRegex,
   GalleryImagesSchema,
   IArt,
+  IArtLocation,
   IDiscordImageID,
+  IDiscordImageIDHyphenated,
   IDiscordImagePath,
   IDiscordImageURL,
   IGalleryImages,
@@ -43,21 +45,23 @@ const GALLERY_IMAGES = GalleryImagesSchema.parse(
 ) as IGalleryImages;
 
 function formatURL(
-  url: IDiscordImagePath | undefined,
+  url: IDiscordImageURL | undefined,
   ratio: number,
   compression: number
 ) {
+  if (!url) return null;
+
   const WIDTH = limitNumberWithinRange(
     window.innerWidth / compression,
     500,
     1800
   );
 
-  return `https://media.discordapp.net/attachments/${url}?width=${Math.ceil(
-    WIDTH
-  )}&height=${Math.ceil(WIDTH * ratio)}` as IDiscordImageURL;
+  return `${url}?width=${Math.ceil(WIDTH)}&height=${Math.ceil(
+    WIDTH * ratio
+  )}` as IDiscordImageURL;
 }
-function RenderYearSidebar(sector: string = 'main') {
+function RenderYearSidebar(sector: IArtLocation = 'main') {
   let out = [];
 
   for (let i = YEAR_RANGE[1]; i >= YEAR_RANGE[0]; i--) {
@@ -94,12 +98,17 @@ function RenderGalleryImages(
                 +new Date(`${a.month}/${a.day}`)
             )
             .map(imageData => {
-              if (!imageData || !imageData.url.match(DiscordImagePathID)?.[0]) {
+              if (
+                !imageData ||
+                !imageData.url.match(DiscordImagePathIDRegex)?.[0]
+              ) {
                 console.error('Failed to load: ' + imageData);
                 return null;
               }
 
-              const ID = imageData.url.match(DiscordImagePathID)?.[0] as string;
+              const ID = imageData.url.match(
+                DiscordImagePathIDRegex
+              )?.[0] as string;
 
               if (
                 isFavoritesURL &&
@@ -154,10 +163,12 @@ interface IProps {
 interface IYearBar {
   isHidden: boolean;
 }
-interface FullIArt extends IArt {
+interface IFetchedArt extends IArt {
   year: number;
   ID: IDiscordImageID;
   ratio: [number, number];
+
+  isClosed: boolean;
 }
 interface IImageFocusOverlayWrapper {
   isShown: boolean;
@@ -174,11 +185,19 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
     []
   );
 
-  let { year: yearFilter, sector: sectorFilter, imageId } = useParams();
+  let {
+    year: yearFilter,
+    sector: sectorFilter,
+    imageId,
+  } = useParams<{
+    year: string;
+    sector: IArtLocation;
+    imageId: IDiscordImageIDHyphenated;
+  }>();
 
   // State
   const dropdownRef = useRef<HTMLSelectElement>(null);
-  const [fetchedArt, setFetchedArt] = useState<FullIArt | null>(null);
+  const [fetchedArt, setFetchedArt] = useState<IFetchedArt | null>(null);
 
   const sectorKeys: ISectorKey[] = ['alt', 'main', 'sketches'];
   if (
@@ -192,16 +211,24 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
   }
 
   useEffect(() => {
-    if (!imageId) setFetchedArt(null);
+    if (!imageId)
+      setFetchedArt(prev => {
+        if (prev === null) return prev;
 
-    let fetched: FullIArt | null = null;
+        return {
+          ...prev,
+          isClosed: true,
+        };
+      });
+
+    let fetched: IFetchedArt | null = null;
 
     Object.keys(GALLERY_IMAGES).every(year =>
       Object.keys(GALLERY_IMAGES[parseInt(year)]).every(sector =>
         GALLERY_IMAGES[parseInt(year)][sector as ISectorKey]?.every(
           imageData => {
             if (
-              imageData.url.match(DiscordImagePathID)?.[0] ===
+              imageData.url.match(DiscordImagePathIDRegex)?.[0] ===
               imageId?.split('-').join('/')
             ) {
               const ratio = imageData.dims;
@@ -211,9 +238,10 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
                 year: parseInt(year),
                 sector,
                 ID: imageData.url.match(
-                  DiscordImagePathID
+                  DiscordImagePathIDRegex
                 )?.[0] as IDiscordImageID,
                 ratio,
+                isClosed: false,
               };
               return false;
             }
@@ -231,11 +259,9 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
   useEffect(() => {
     if (!sectorFilter || !dropdownRef.current) return;
 
-    if (
-      sectorFilter === 'main' ||
-      sectorFilter === 'alt' ||
-      sectorFilter === 'sketches'
-    )
+    const ArtLocations: IArtLocation[] = ['main', 'alt', 'sketches'];
+
+    if (ArtLocations.includes(sectorFilter))
       dropdownRef.current.value = capitalize(sectorFilter);
     else navigate(`/gallery/${yearFilter}/main`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -301,12 +327,12 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
         </MasonryGallery>
 
         <ImageFocusOverlayWrapper
-          isShown={fetchedArt !== null}
+          isShown={fetchedArt?.isClosed === false}
           onClick={() =>
             navigate(location.pathname.replace(/[0-9]+-[0-9]+/, ''))
           }
         >
-          {fetchedArt !== null && <Loader />}
+          {fetchedArt?.isClosed === false && <Loader />}
           <FocusedGalleryImage
             year={fetchedArt?.year}
             month={fetchedArt?.month}
@@ -548,10 +574,11 @@ const ImageFocusOverlayWrapper = styled.div<IImageFocusOverlayWrapper>`
   justify-content: center;
   align-items: center;
 
-  transition: 1s opacity ease-out;
+  transition: 250ms opacity ease-out;
   ${props =>
     props.isShown &&
     `
+    transition: 500ms opacity ease-out;
     pointer-events: all;
     opacity: 1;
   `}

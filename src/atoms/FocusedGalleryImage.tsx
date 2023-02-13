@@ -21,7 +21,7 @@ import useWindowResize from '../hooks/useWindowResize';
 import { isMobile } from 'react-device-detect';
 
 interface IProps {
-  src: IDiscordImageURL;
+  src: IDiscordImageURL | null;
   alt?: string;
   year?: number;
   sector?: string;
@@ -93,6 +93,8 @@ function FocusedGalleryImage({
 
     setInfoBarWidth(getObjectRects(imageRef.current).positioned.width);
   }, [windowWidth]);
+
+  if (!src) return null;
 
   return (
     <div onClick={e => e.stopPropagation()}>

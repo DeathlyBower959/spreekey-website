@@ -14,9 +14,10 @@ import {
 } from 'discord.js';
 
 import {
+  IArtLocation,
   IArt,
   IArtYear,
-  IDiscordImagePath,
+  IDiscordImageURL,
   IGalleryImages,
 } from '../../src/galleryImages';
 import Logger from './logger';
@@ -32,10 +33,16 @@ const BotLog = new Logger('Bot', LogsCategoryID, client);
 const ImageLog = new Logger('Image', LogsCategoryID, client);
 
 interface IArtYearChannels {
-  main: null | Snowflake;
-  alt: null | Snowflake;
-  sketches: null | Snowflake;
+  main: Snowflake | null;
+  alt: Snowflake | null;
+  sketches: Snowflake | null;
 }
+interface TotalCount {
+  main: number;
+  alt: number;
+  sketches: number;
+}
+type SectorKey = keyof IArtYear;
 type Messages = IArt[];
 
 async function FetchAllMessages(channel?: TextChannel): Promise<Message[]> {
@@ -84,28 +91,34 @@ function PopulateMessages(
         }
 
         attachments.forEach(async attachment => {
-          const URL = attachment.proxyURL.match(
-            /([0-9]+)\/([0-9]+)\/[A-z,0-9,-]+.[A-z]+/
-          )?.[0] as IDiscordImagePath;
+          const url = (
+            attachment.contentType === 'image/gif'
+              ? attachment.url
+              : attachment.proxyURL
+          ) as IDiscordImageURL;
 
-          if (!URL) {
+          if (!url) {
             ImageLog.error(`No image URL: ${msg.url}`);
+            return;
           }
 
-          const probeResult = await probe(
-            `https://media.discordapp.net/attachments/${URL}`
-          ).catch(err => {
-            ImageLog.error('Failed to load image: ', URL, err);
+          let probeResult = await probe(url).catch(err => {
+            ImageLog.error('Failed to load image: ', url, err);
           });
 
-          if (!probeResult) return;
+          // Defaults in case of probe failure
+          if (!probeResult)
+            probeResult = {
+              width: 1080,
+              height: 720,
+            } as probe.ProbeResult;
 
           const { width, height } = probeResult;
 
           const dims: [number, number] = [width, height];
 
           let data: Messages[0] = {
-            url: URL,
+            url,
             dims,
           };
 
@@ -119,7 +132,7 @@ function PopulateMessages(
           outMessages.push(data);
           ImageLog.noConsole().info(
             `Image added:`,
-            `https://media.discordapp.net/attachments/${URL}`,
+            url,
             `WxH: ${width}x${height}`
           );
         });
@@ -132,7 +145,7 @@ function PopulateMessages(
   });
 }
 
-function handlePopulateError(type: 'Main' | 'Alt' | 'Sketches', reason: any) {
+function handlePopulateError(type: IArtLocation, reason: any) {
   Log.error(reason + type);
 }
 async function GetMessages(
@@ -171,17 +184,17 @@ async function GetMessages(
     let mainMessages: Msgs = await PopulateMessages(
       parseInt(year),
       mainChannel
-    ).catch(r => handlePopulateError('Main', r));
+    ).catch(r => handlePopulateError('main', r));
 
     let altMessages: Msgs = await PopulateMessages(
       parseInt(year),
       altChannel
-    ).catch(r => handlePopulateError('Alt', r));
+    ).catch(r => handlePopulateError('alt', r));
 
     let sketchesMessages: Msgs = await PopulateMessages(
       parseInt(year),
       sketchesChannel
-    ).catch(r => handlePopulateError('Sketches', r));
+    ).catch(r => handlePopulateError('sketches', r));
 
     if (!mainMessages) mainMessages = [];
     if (!altMessages) altMessages = [];
@@ -214,11 +227,17 @@ client.on('ready', async () => {
     channel => channel.type === 4 && channel.name.match(/[0-9]{3}/)
   );
 
+  if (CATEGORIES?.size <= 0) {
+    BotLog.error('Failed to find categories');
+    return;
+  }
+
   let channelIDs: {
     [key: string]: IArtYearChannels;
   } = {};
 
-  CATEGORIES?.forEach(cat => {
+  const ArtLocations: IArtLocation[] = ['main', 'alt', 'sketches'];
+  CATEGORIES.forEach(cat => {
     cat = cat as CategoryChannel;
     Log.info(`Processing Category: ${cat.name}`);
 
@@ -229,11 +248,9 @@ client.on('ready', async () => {
     };
 
     cat.children.cache.forEach(channel => {
-      const index = channel.name.split(/[–, -]/)[1] as
-        | 'main'
-        | 'alt'
-        | 'sketches';
-      if (!['main', 'alt', 'sketches'].includes(index)) {
+      const index = channel.name.split(/[–, -]/)[1] as IArtLocation;
+
+      if (!ArtLocations.includes(index)) {
         Log.error(
           'Failed to load channel: ' + channel.id + ' | ' + channel.name
         );
@@ -259,12 +276,6 @@ client.on('ready', async () => {
 
   let out: IGalleryImages = await GetMessages(channelIDs, GUILD);
 
-  interface TotalCount {
-    main: number;
-    alt: number;
-    sketches: number;
-  }
-  type SectorKey = keyof IArtYear;
   const totals: TotalCount = Object.values(out).reduce(
     (totalAccumulator: TotalCount, year: IArtYear) => {
       let accumulated = totalAccumulator;
@@ -291,7 +302,7 @@ client.on('ready', async () => {
     `Alt: ${totals.alt}`,
     `Sketches: ${totals.sketches}`
   ).newLine();
-  // BotLog.raw(`<@${process.env.PING_ID}>`)
+  BotLog.raw(`<@${process.env.PING_ID}>`);
 
   Log.info('Writing data to json...');
   try {
@@ -307,9 +318,9 @@ client.on('ready', async () => {
     Log.error('Failed to write data');
   }
 
-  await BotLog.write();
-  await Log.write();
-  await ImageLog.write();
+  // await BotLog.write();
+  // await Log.write();
+  // await ImageLog.write();
 
   process.exit(0);
 });

@@ -10,9 +10,10 @@ export interface IArtYear {
   alt?: IArt[];
   sketches?: IArt[];
 }
+export type IArtLocation = keyof IArtYear;
 
 export interface IArt {
-  url: IDiscordImagePath;
+  url: IDiscordImageURL;
   dims: [number, number];
   month?: number;
   day?: number;
@@ -25,17 +26,22 @@ export interface IArtWithSector extends IArt {
 }
 
 export type IDiscordImageID = `${number}/${number}`;
+export type IDiscordImageIDHyphenated = `${number}-${number}`;
 export type IDiscordImagePath = `${IDiscordImageID}/${string}`;
 export type IDiscordImageURL =
-  `https://media.discordapp.net/attachments/${IDiscordImagePath}`;
+  | `https://media.discordapp.net/attachments/${IDiscordImagePath}`
+  | `https://cdn.discordapp.com/attachments/${IDiscordImagePath}`;
 
-export const DiscordImagePathID = /([0-9]+)\/([0-9]+)/;
-export const DiscordImagePathRegex = /([0-9]+)\/([0-9]+)\/[A-z,0-9,-]+.[A-z]+/;
-export const DiscordImageURLRegex =
-  /https:\/\/media.discordapp.net\/attachments\/([0-9]+)\/([0-9]+)\/[A-z,0-9,-]+.[A-z]+/;
-
+export const DiscordImagePathIDRegex = new RegExp('([0-9]+)/([0-9]+)');
+export const DiscordImagePathRegex = new RegExp(
+  DiscordImagePathIDRegex.source + '/[A-z,0-9,-]+.[A-z]+'
+);
+export const DiscordImageURLRegex = new RegExp(
+  'https://(media|cdn).discordapp.(net|com)/attachments/' +
+    DiscordImagePathRegex.source
+);
 export const ArtSchema = z.object({
-  url: z.string().regex(DiscordImagePathRegex),
+  url: z.string().regex(DiscordImageURLRegex),
   dims: z.array(z.number()).length(2),
   month: z.number().min(1).max(12).optional(),
   day: z.number().min(1).max(31).optional(),
