@@ -1,81 +1,56 @@
-import { Fields, List, Card } from './types'
+import { Fields, List, Card, Board } from './types';
 
-import Axios from 'axios'
-import { trelloConfig } from '../config'
+import { trelloConfig } from '../config';
+import { request } from './wrapper';
 
-export async function getLists(fields: Fields = null): Promise<List[]> {
-  try {
-    const res = await Axios.get(
-      `${trelloConfig.API}/boards/${trelloConfig.BOARD_ID}/lists${
-        fields && `?fields=${fields.join(',')}`
-      }`
-    )
-
-    return res.data
-  } catch (error: any) {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      return error.response
-    } else if (error.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-
-      return error.request
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log('Error', error.message)
-      return error
-    }
-  }
+export async function getBoards(fields: Fields = []) {
+  return request<Board[]>(
+    `/organizations/${trelloConfig.WORKSPACE_ID}/boards`,
+    fields
+  );
 }
 
-export async function getCards(
-  listID: string,
-  fields: Fields = null
-): Promise<Card[]> {
-  try {
-    const res = await Axios.get(
-      `${trelloConfig.API}/lists/${listID}/cards${
-        fields && `?fields=${fields.join(',')}`
-      }`
-    )
-
-    return res.data
-  } catch (error: any) {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      return error.response
-    } else if (error.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-
-      return error.request
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log('Error', error.message)
-      return error
-    }
-  }
+export async function getLists(boardId: string, fields: Fields = []) {
+  return request<List[]>(`/boards/${boardId}/lists`, fields);
 }
 
-export function getTrelloData(): Promise<List[]> {
+export async function getCards(listID: string, fields: Fields = []) {
+  return request<Card[]>(`/lists/${listID}/cards`, fields);
+}
+
+export async function getTrelloData(): Promise<Board[]> {
   return new Promise(async (resolve, reject) => {
-    const lists = await getLists(['id', 'name'])
+    const boards = await getBoards(['name', 'shortUrl']);
 
-    if (!lists) reject('Error fetching Trello data')
+    if (!boards) return reject('Error fetching Trello data');
 
-    let data = [...lists]
+    let data = [...boards];
 
-    lists.forEach(async (list, idx: number) => {
-      const cards = await getCards(list.id, ['name', 'labels', 'shortUrl'])
-      // Even if cards are null
-      data[idx] = { ...data[idx], cards: cards.length === 0 ? null : cards }
-    })
+    boards.forEach(async (board, bIdx) => {
+      let lists = await getLists(board.id, ['name']);
 
-    resolve(data)
-  })
+      lists.forEach(async (list, lIdx) => {
+        const cards = await getCards(list.id, ['name', 'labels', 'shortUrl']);
+
+        lists[lIdx] = {
+          ...lists[lIdx],
+          cards: cards.length === 0 ? [] : cards,
+        };
+      });
+
+      data[bIdx] = {
+        ...data[bIdx],
+        lists: lists.length === 0 ? [] : lists,
+      };
+    });
+
+    console.log(data);
+    resolve(data);
+  });
+}
+
+export function write() {
+  getTrelloData().then(data => {
+    console.log(data);
+  });
 }

@@ -1,24 +1,28 @@
-export type Fields = string[] | null
+export type Fields = string[];
+
+export interface Board {
+  id: string;
+  name: string;
+  shortUrl: string;
+  lists: List[];
+}
 
 export interface List {
-  id: string
-  name: string
-  closed?: boolean
-  idBoard?: string
-  pos?: number
-  cards?: Card[] | null
+  id: string;
+  name: string;
+  cards: Card[];
 }
 
 export interface Card {
-  id: string
-  name: string
-  labels: Label[]
-  shortUrl: string
+  id: string;
+  name: string;
+  labels: Label[];
+  shortUrl: string;
 }
 
 export interface Label {
-  id: string
-  idBoard: string
-  name: string
-  color: string
+  id: string;
+  idBoard: string;
+  name: string;
+  color: string;
 }
