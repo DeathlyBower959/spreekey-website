@@ -64,7 +64,7 @@ function Navbar() {
     });
   }
 
-  // FIX: When screen is resized, the menu doesnt work properly with mouse over
+  // FIX: When screen is resized, the menu doesn't work properly with mouse over
   // This is because it only checks if its in a certain threshold, not if its touching the element
   // Optimize both functions but not repetitively mutating state.
   function onMouseMove(e: MouseEvent) {
