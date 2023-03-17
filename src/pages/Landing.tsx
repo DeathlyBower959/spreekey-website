@@ -235,10 +235,13 @@ const Title = styled.h1`
     font-size: 2em;
   }
 `;
-const SubHeader = styled.h3`
+const SubHeader = styled.p`
   text-align: center;
   margin-left: 1em;
   margin-right: 1em;
+
+  font-weight: bold;
+  font-size: 1.25em;
 `;
 const Button = styled(Link)`
   padding: 1em 2em;

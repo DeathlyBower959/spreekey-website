@@ -24,15 +24,25 @@ function Footer() {
         <SectionWrapperRight>
           <SocialWrapper>
             <Social
+              aria-label='Instagram'
               href='https://instagram.com/spreekey'
               children={<Instagram />}
             />
-            <Social href='https://toyhou.se/spreekey' children={<ToyHouse />} />
             <Social
+              aria-label='Toy House'
+              href='https://toyhou.se/spreekey'
+              children={<ToyHouse />}
+            />
+            <Social
+              aria-label='Twitter'
               href='https://twitter.com/spreekey'
               children={<Twitter />}
             />
-            <Social href='https://ko-fi.com/spreekey' children={<KoFi />} />
+            <Social
+              aria-label='Ko Fi'
+              href='https://ko-fi.com/spreekey'
+              children={<KoFi />}
+            />
           </SocialWrapper>
         </SectionWrapperRight>
       </InnerWrapper>
