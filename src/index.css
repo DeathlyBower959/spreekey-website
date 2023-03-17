@@ -16,7 +16,8 @@
 
   /* Foreground */
   --foreground: #acc3bb;
-  --secondary-foreground: #404a46;
+  /* --secondary-foreground: #404a46; */
+  --secondary-foreground: #6a7e76;
 
   /* Accent */
   /* --accent: #b3934e; */
