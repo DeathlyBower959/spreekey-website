@@ -22,7 +22,7 @@ function Loader({ style }: IProps) {
 }
 
 const DotWrapper = styled.div`
-  position: absolute;
+  position: relative;
 `;
 const Dot = styled.div`
   position: absolute;

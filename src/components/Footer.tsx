@@ -1,12 +1,13 @@
 // Packages
-import styled from 'styled-components'
+import styled from 'styled-components';
+import { memo } from 'react';
 
 // Atoms
-import Logo from '../atoms/icons/Logo'
-import Instagram from '../atoms/icons/socials/Instagram'
-import KoFi from '../atoms/icons/socials/Ko-Fi'
-import ToyHouse from '../atoms/icons/socials/ToyHouse'
-import Twitter from '../atoms/icons/socials/Twitter'
+import Logo from '../atoms/icons/Logo';
+import Instagram from '../atoms/icons/socials/Instagram';
+import KoFi from '../atoms/icons/socials/Ko-Fi';
+import ToyHouse from '../atoms/icons/socials/ToyHouse';
+import Twitter from '../atoms/icons/socials/Twitter';
 
 // Main
 function Footer() {
@@ -40,7 +41,7 @@ function Footer() {
         <Logo color='#0000002a' />
       </FooterBackground>
     </FooterWrapper>
-  )
+  );
 }
 
 const FooterWrapper = styled.footer`
@@ -54,7 +55,7 @@ const FooterWrapper = styled.footer`
 
   margin-top: auto;
   justify-self: flex-end;
-`
+`;
 
 const InnerWrapper = styled.div`
   height: 100%;
@@ -64,17 +65,17 @@ const InnerWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
 
-  @media only screen and (max-width: 500px) {
+  @media only screen and (max-width: 31rem) {
     text-align: center;
     flex-direction: column;
     justify-content: space-evenly;
   }
 
   z-index: 1;
-`
+`;
 
-const SectionWrapperLeft = styled.div``
-const SectionWrapperRight = styled.div``
+const SectionWrapperLeft = styled.div``;
+const SectionWrapperRight = styled.div``;
 
 const FooterBackground = styled.div`
   position: absolute;
@@ -89,20 +90,20 @@ const FooterBackground = styled.div`
   padding: 1em;
 
   pointer-events: none;
-`
+`;
 
 const Name = styled.h1`
   color: var(--foreground);
-`
+`;
 
 const Copyright = styled.p`
   color: var(--secondary-foreground);
-`
+`;
 
 const SocialWrapper = styled.div`
   display: flex;
   gap: 1em;
-`
+`;
 
 const Social = styled.a.attrs({ target: '_blank' })`
   width: 2em;
@@ -131,6 +132,6 @@ const Social = styled.a.attrs({ target: '_blank' })`
   #toyhouse-text {
     fill: #888;
   }
-`
+`;
 
-export default Footer
+export default memo(Footer);

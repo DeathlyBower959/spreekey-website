@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 interface IProps {
   enabled: boolean;
@@ -118,7 +118,10 @@ const Circle = styled.div<IWrapper>`
 
   ${props =>
     props.enabled &&
-    `animation: 550ms cubic-bezier(0.66, 0.03, 0.27, 1.34) forwards AnimateCircle;`}
+    css`
+      animation: 550ms cubic-bezier(0.66, 0.03, 0.27, 1.34) forwards
+        AnimateCircle;
+    `}
 
   @keyframes AnimateCircle {
     0% {

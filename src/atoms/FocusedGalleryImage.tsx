@@ -1,5 +1,5 @@
 // Packages
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useDoubleTap } from 'use-double-tap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BiLinkExternal } from 'react-icons/bi';
@@ -101,7 +101,7 @@ function FocusedGalleryImage({
       <ImageWrapper {...handleDoubleTap} isLoaded={isLoaded}>
         <CloseIcon
           onClick={() =>
-            navigate(location.pathname.replace(/[0-9]+-[0-9]+/, ''))
+            navigate(location.pathname.replace(/(\d+-\d+\/?)+/, ''))
           }
         />
 
@@ -182,8 +182,10 @@ const ImageWrapper = styled.div<IImageWrapper>`
 
   ${props =>
     props.isLoaded &&
-    `opacity: 1;
-  filter: blur(0);`}
+    css`
+      opacity: 1;
+      filter: blur(0);
+    `}
 `;
 
 const NewLinkIcon = styled(BiLinkExternal)`
@@ -268,7 +270,7 @@ const InfoBar = styled.div<IInfoBar>`
   justify-content: space-between;
   gap: 1em;
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 50rem) {
     height: 0;
     position: absolute;
     overflow: hidden;
@@ -296,7 +298,7 @@ const InfoGroup = styled.div`
   justify-content: center;
   gap: 1em;
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 50rem) {
     flex-direction: column;
   }
 `;
@@ -315,7 +317,7 @@ const InfoTab = styled.div`
 
   border-radius: 8px 8px 0 0;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: 48rem) {
     display: block;
   }
 `;

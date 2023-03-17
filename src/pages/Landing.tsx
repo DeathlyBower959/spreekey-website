@@ -1,28 +1,28 @@
 // Packages
-import styled from 'styled-components'
-import { Link } from 'react-router-dom'
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 // Assets
 // TODO: Optimize image loading/replace with zitra artwork
-import HeroImage from '../assets/background/hero-section.jpg'
-import GalleryImage from '../assets/background/gallery-section.jpg'
-import CommissionsImage from '../assets/background/commissions-section.jpg'
-import StoreImage from '../assets/background/store-section.jpg'
+import HeroImage from '../assets/background/hero-section.jpg';
+import GalleryImage from '../assets/background/gallery-section.jpg';
+import CommissionsImage from '../assets/background/commissions-section.jpg';
+import StoreImage from '../assets/background/store-section.jpg';
 
 // Atoms
-import LazyImage from '../atoms/LazyImage'
+import LazyImage from '../atoms/LazyImage';
 
-import Logo from '../atoms/icons/Logo'
-import Watermark from '../atoms/icons/Watermark'
-import KoFi from '../atoms/icons/socials/Ko-Fi'
-import Instagram from '../atoms/icons/socials/Instagram'
-import Twitter from '../atoms/icons/socials/Twitter'
-import ToyHouse from '../atoms/icons/socials/ToyHouse'
+import Logo from '../atoms/icons/Logo';
+import Watermark from '../atoms/icons/Watermark';
+import KoFi from '../atoms/icons/socials/Ko-Fi';
+import Instagram from '../atoms/icons/socials/Instagram';
+import Twitter from '../atoms/icons/socials/Twitter';
+import ToyHouse from '../atoms/icons/socials/ToyHouse';
 
 // Types
 interface ISupportLowerInnerProps {
-  target: string
-  href: string
+  target: string;
+  href: string;
 }
 
 // Main
@@ -99,7 +99,7 @@ function Landing() {
         </SupportLower>
       </SupportSection>
     </>
-  )
+  );
 }
 
 const Section = styled.section`
@@ -109,7 +109,7 @@ const Section = styled.section`
   overflow-y: hidden;
   /* box-shadow: 0 0 50px 50px var(--background) inset; */
   margin-bottom: 7rem !important;
-`
+`;
 const SectionBGImage = styled(LazyImage)`
   position: absolute;
   width: 100%;
@@ -124,12 +124,12 @@ const SectionBGImage = styled(LazyImage)`
 
   filter: brightness(0.35) blur(5px);
   z-index: -2;
-`
+`;
 
 // Sections
 const HeroSection = styled(Section).attrs({ id: 'hero-section' })`
   height: 100vh;
-`
+`;
 const AboutMeSection = styled(Section).attrs({ id: 'about-me-section' })`
   width: 80%;
   margin: 0 auto;
@@ -141,7 +141,7 @@ const AboutMeSection = styled(Section).attrs({ id: 'about-me-section' })`
 
   display: flex;
   flex-direction: column;
-`
+`;
 const MainSections = styled(Section)`
   height: 50em;
 
@@ -151,13 +151,13 @@ const MainSections = styled(Section)`
   justify-content: center;
 
   gap: 2em;
-`
-const GallerySection = styled(MainSections).attrs({ id: 'gallery-section' })``
+`;
+const GallerySection = styled(MainSections).attrs({ id: 'gallery-section' })``;
 const CommissionsSection = styled(MainSections).attrs({
   id: 'commissions-section',
-})``
-const StoreSection = styled(MainSections).attrs({ id: 'store-section' })``
-const SupportSection = styled(Section).attrs({ id: 'support-section' })``
+})``;
+const StoreSection = styled(MainSections).attrs({ id: 'store-section' })``;
+const SupportSection = styled(Section).attrs({ id: 'support-section' })``;
 
 // Hero Page
 const LogoWrapper = styled.div`
@@ -170,7 +170,7 @@ const LogoWrapper = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-`
+`;
 const LogoContainer = styled.div`
   height: min(50vw, 50vh);
   width: 100%;
@@ -178,7 +178,7 @@ const LogoContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 // About Me
 const ReadMoreAbout = styled(Link)`
@@ -186,7 +186,7 @@ const ReadMoreAbout = styled(Link)`
   color: var(--secondary-foreground);
   margin-top: 0.5em;
   font-size: 0.85em;
-`
+`;
 
 // Support Page
 const SupportUpper = styled.a`
@@ -195,51 +195,51 @@ const SupportUpper = styled.a`
   align-items: center;
 
   text-decoration: none;
-`
+`;
 const SupportLower = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   gap: 3em;
-`
+`;
 const SupportLowerInner = styled(SupportLower).attrs({
   as: 'a',
 })<ISupportLowerInnerProps>`
   gap: 0;
   text-decoration: none;
-`
+`;
 const SupportDivider = styled.hr`
   margin: 2em auto;
   width: 70%;
   border: 1px solid var(--secondary-background);
-`
+`;
 const SupportText = styled.p`
   font-size: 2em;
   text-decoration: none;
   color: var(--foreground);
 
-  @media only screen and (max-width: 500px) {
+  @media only screen and (max-width: 31rem) {
     font-size: 1.5em;
   }
-`
+`;
 const IconWrapper = styled.div`
   width: 6em;
   padding-right: 1em;
-`
+`;
 
 // UI
 const Title = styled.h1`
   font-size: 3em;
-  @media only screen and (max-width: 400px) {
+  @media only screen and (max-width: 25rem) {
     font-size: 2em;
   }
-`
+`;
 const SubHeader = styled.h3`
   text-align: center;
   margin-left: 1em;
   margin-right: 1em;
-`
+`;
 const Button = styled(Link)`
   padding: 1em 2em;
   background-color: transparent;
@@ -288,6 +288,6 @@ const Button = styled(Link)`
     transform: translateY(-50%) translateX(50%);
     font-size: 1.75em;
   }
-`
+`;
 
-export default Landing
+export default Landing;

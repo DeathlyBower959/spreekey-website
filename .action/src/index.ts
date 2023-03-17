@@ -130,11 +130,6 @@ function PopulateMessages(
             };
 
           outMessages.push(data);
-          ImageLog.noConsole().info(
-            `Image added:`,
-            url,
-            `WxH: ${width}x${height}`
-          );
         });
 
         res(outMessages);
@@ -145,7 +140,7 @@ function PopulateMessages(
   });
 }
 
-function handlePopulateError(type: IArtLocation, reason: any) {
+function handlePopulateError(type: IArtLocation, reason: string) {
   Log.error(reason + type);
 }
 async function GetMessages(
@@ -302,7 +297,6 @@ client.on('ready', async () => {
     `Alt: ${totals.alt}`,
     `Sketches: ${totals.sketches}`
   ).newLine();
-  BotLog.raw(`<@${process.env.PING_ID}>`);
 
   Log.info('Writing data to json...');
   try {
@@ -318,11 +312,12 @@ client.on('ready', async () => {
     Log.error('Failed to write data');
   }
 
-  // await BotLog.write();
-  // await Log.write();
-  // await ImageLog.write();
+  await BotLog.write();
+  await Log.write();
+  await ImageLog.write();
 
   process.exit(0);
 });
 
 client.login(process.env.DISCORD_TOKEN);
+// FIX: 2023 sketches not loading? (gives different art count each time)

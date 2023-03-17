@@ -1,18 +1,27 @@
-import { Fields } from './types';
+import { type Fields } from './trello';
 
 import Axios from 'axios';
 import { trelloConfig } from '../config';
+import { z } from 'zod';
 
-export async function request<T>(
+export async function get<TData>(
   url: `/${string}`,
-  fields: Fields
-): Promise<T> {
+  fields: Fields,
+  schema: z.Schema
+): Promise<TData> {
   try {
     let urlBuilder = new URL(`${trelloConfig.API}${url}`);
     urlBuilder.searchParams.append('fields', fields.join(','));
 
     const res = await Axios.get(urlBuilder.toString());
-    return res.data;
+    const data = schema.safeParse(res.data);
+
+    if (!data.success) {
+      console.error(`Failed to parse response: ${data.error}`);
+      return Promise.reject(data.error);
+    }
+
+    return data.data;
   } catch (error: any) {
     if (error.response) {
       // The request was made and the server responded with a status code

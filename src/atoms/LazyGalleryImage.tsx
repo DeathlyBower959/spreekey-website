@@ -33,6 +33,8 @@ interface IProps {
   month?: number;
   day?: number;
 
+  // width: number;
+
   scrollPosition: ScrollPosition;
 }
 interface IMiddleHeartPositionWrapper {
@@ -51,6 +53,8 @@ function LazyGalleryImage({
 
   favoriteToggle,
   favorite,
+
+  // width,
 
   month,
   day,
@@ -91,6 +95,7 @@ function LazyGalleryImage({
           filter: isLoaded ? 'blur(0px)' : 'blur(10px)',
           opacity: isLoaded ? '1' : '0',
         }}
+        // style={{ width }}
       >
         <StyledLazyLoadImage
           style={{
@@ -186,7 +191,7 @@ const DateOverlay = styled(InnerOverlay)`
   left: 0.5em;
   top: 0.5em;
 `;
-// TODO: Accessibility
+// TODO: Accessibility (tab-index)
 const OpenLargerOverlay = styled.div`
   font-size: 2.5em;
   position: absolute;

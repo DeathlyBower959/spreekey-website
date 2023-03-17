@@ -1,9 +1,9 @@
 // Packages
-import styled from 'styled-components';
+import { z } from 'zod';
+import styled, { css } from 'styled-components';
 import React, { useRef, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AiFillHome } from 'react-icons/ai';
-import Masonry from 'react-masonry-css';
 import { motion } from 'framer-motion';
 import {
   ScrollPosition,
@@ -11,26 +11,30 @@ import {
 } from 'react-lazy-load-image-component';
 import { isMobile } from 'react-device-detect';
 import { ImHeart } from 'react-icons/im';
-import FocusedGalleryImage from '../atoms/FocusedGalleryImage';
 
 // Config
 import { IMAGE_COMPRESSION, YEAR_RANGE } from '../config';
-import GalleryImages from '../galleryImages.json';
+import GalleryImagesData from '../galleryImages.json';
 import {
   DiscordImagePathIDRegex,
+  DiscordImagePathRegex,
   GalleryImagesSchema,
   IArt,
   IArtLocation,
   IDiscordImageID,
-  IDiscordImageIDHyphenated,
   IDiscordImagePath,
   IDiscordImageURL,
   IGalleryImages,
+  ISectorKey,
 } from '../galleryImages';
 
+// Components
+import GalleryImages from '../components/GalleryImages';
+
 // Atoms
-import LazyGalleryImage from '../atoms/LazyGalleryImage';
 import Notification from '../atoms/Notification';
+import Loader from '../atoms/loaders/Loader';
+import FocusedGalleryImage from '../atoms/FocusedGalleryImage';
 
 // Hooks
 import useLocalStorage from '../hooks/useLocalStorage';
@@ -38,13 +42,13 @@ import useLocalStorage from '../hooks/useLocalStorage';
 // Util
 import capitalize from '../util/upperCaseFirst';
 import limitNumberWithinRange from '../util/limitNum';
-import Loader from '../atoms/loaders/Loader';
+import YearSidebar from '../components/YearSidebar';
 
 const GALLERY_IMAGES = GalleryImagesSchema.parse(
-  GalleryImages
+  GalleryImagesData
 ) as IGalleryImages;
 
-function formatURL(
+export function formatURL(
   url: IDiscordImageURL | undefined,
   ratio: number,
   compression: number
@@ -60,99 +64,6 @@ function formatURL(
   return `${url}?width=${Math.ceil(WIDTH)}&height=${Math.ceil(
     WIDTH * ratio
   )}` as IDiscordImageURL;
-}
-function RenderYearSidebar(sector: IArtLocation = 'main') {
-  let out = [];
-
-  for (let i = YEAR_RANGE[1]; i >= YEAR_RANGE[0]; i--) {
-    out.push(
-      <SidebarYear to={`/gallery/${i}/${sector}`} key={i}>
-        {i}
-      </SidebarYear>
-    );
-  }
-
-  return out;
-}
-// TODO: Improve sorting, ignoring sector
-// TODO: react-window
-function RenderGalleryImages(
-  yearFilter: string | undefined,
-  sectorFilter: string | undefined,
-  scrollPosition: ScrollPosition,
-  favoriteArt: IDiscordImagePath[],
-  setFavoriteArt: React.Dispatch<React.SetStateAction<IDiscordImagePath[]>>,
-  isFavoritesURL: boolean = false
-) {
-  return Object.keys(GALLERY_IMAGES)
-    .filter(x => (yearFilter ? x === yearFilter : true))
-    .sort((a, b) => (parseInt(a) < parseInt(b) ? 1 : -1))
-    .map(year =>
-      Object.keys(GALLERY_IMAGES[parseInt(year)])
-        .filter(x => (sectorFilter ? x === sectorFilter : true))
-        .map(sector =>
-          GALLERY_IMAGES[parseInt(year)][sector as ISectorKey]
-            ?.sort(
-              (a, b) =>
-                +new Date(`${b.month}/${b.day}`) -
-                +new Date(`${a.month}/${a.day}`)
-            )
-            .map(imageData => {
-              if (
-                !imageData ||
-                !imageData.url.match(DiscordImagePathIDRegex)?.[0]
-              ) {
-                console.error('Failed to load: ' + imageData);
-                return null;
-              }
-
-              const ID = imageData.url.match(
-                DiscordImagePathIDRegex
-              )?.[0] as string;
-
-              if (
-                isFavoritesURL &&
-                !favoriteArt.includes(ID as IDiscordImagePath)
-              )
-                return null;
-
-              const ratio = imageData.dims[1] / imageData.dims[0];
-
-              return (
-                <LazyGalleryImage
-                  scrollPosition={scrollPosition}
-                  year={parseInt(year)}
-                  month={imageData.month}
-                  day={imageData.day}
-                  sector={sector}
-                  key={ID}
-                  ID={ID}
-                  favoriteToggle={() => {
-                    if (favoriteArt.includes(ID as IDiscordImagePath))
-                      setFavoriteArt(prev => prev.filter(x => x !== ID));
-                    else
-                      setFavoriteArt(prev => [
-                        ...prev,
-                        ID as IDiscordImagePath,
-                      ]);
-                  }}
-                  favorite={favoriteArt.includes(ID as IDiscordImagePath)}
-                  initial={formatURL(
-                    imageData.url,
-                    ratio,
-                    IMAGE_COMPRESSION.preview
-                  )}
-                  src={formatURL(
-                    imageData.url,
-                    ratio,
-                    IMAGE_COMPRESSION.default
-                  )}
-                />
-              );
-            })
-        )
-    )
-    .filter(x => x !== null);
 }
 
 // Types
@@ -173,7 +84,13 @@ interface IFetchedArt extends IArt {
 interface IImageFocusOverlayWrapper {
   isShown: boolean;
 }
-type ISectorKey = keyof typeof GALLERY_IMAGES['2023'];
+
+// Zod
+const favoriteArtSchema = z.array(
+  z.custom<IDiscordImagePath>(x =>
+    DiscordImagePathRegex.test((x as string) || '')
+  )
+);
 
 // Main
 function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
@@ -182,6 +99,7 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
   const location = useLocation();
   const [favoriteArt, setFavoriteArt] = useLocalStorage<IDiscordImagePath[]>(
     'favorited_art',
+    favoriteArtSchema,
     []
   );
 
@@ -192,7 +110,7 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
   } = useParams<{
     year: string;
     sector: IArtLocation;
-    imageId: IDiscordImageIDHyphenated;
+    imageId: IDiscordImageID<'-'>;
   }>();
 
   // State
@@ -279,7 +197,9 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
   return (
     <Wrapper>
       <Sidebar>
-        <YearWrapper>{RenderYearSidebar(sectorFilter)}</YearWrapper>
+        <YearWrapper>
+          <YearSidebar sector={sectorFilter} />
+        </YearWrapper>
         <Link to='/gallery/favorites'>
           <HeartButton />
         </Link>
@@ -306,25 +226,16 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
             </SelectedSector>
           </SelectorWrapper>
         </YearBar>
-        <MasonryGallery
-          breakpointCols={{
-            default: 4,
-            1500: 3,
-            900: 2,
-            650: 1,
-          }}
-          className='gallery-masonry-grid'
-          columnClassName='gallery-masonry-grid_column'
-        >
-          {RenderGalleryImages(
-            yearFilter,
-            sectorFilter,
-            scrollPosition,
-            favoriteArt,
-            setFavoriteArt,
-            isFavoritesURL
-          )}
-        </MasonryGallery>
+
+        <GalleryImages
+          GALLERY_IMAGES={GALLERY_IMAGES}
+          yearFilter={yearFilter}
+          sectorFilter={sectorFilter}
+          scrollPosition={scrollPosition}
+          favoriteArt={favoriteArt}
+          setFavoriteArt={setFavoriteArt}
+          isFavoritesURL={!!isFavoritesURL}
+        />
 
         <ImageFocusOverlayWrapper
           isShown={fetchedArt?.isClosed === false}
@@ -332,7 +243,17 @@ function Gallery({ scrollPosition, isFavoritesURL }: IProps) {
             navigate(location.pathname.replace(/[0-9]+-[0-9]+/, ''))
           }
         >
-          {fetchedArt?.isClosed === false && <Loader />}
+          {fetchedArt?.isClosed === false && (
+            <div
+              style={{
+                left: '50%',
+                transform: 'translateX(-50%)',
+                position: 'absolute',
+              }}
+            >
+              <Loader />
+            </div>
+          )}
           <FocusedGalleryImage
             year={fetchedArt?.year}
             month={fetchedArt?.month}
@@ -396,7 +317,7 @@ const Sidebar = styled.div`
   padding-top: 3em;
   padding-bottom: 2em;
 
-  transition: width 750ms ease;
+  transition: width 500ms ease;
   overflow: hidden;
 
   height: ${isMobile ? 'calc(100vh - 5em)' : '100vh'};
@@ -423,7 +344,7 @@ const Sidebar = styled.div`
 
     border-radius: 0 8px 8px 0;
 
-    transition: left 750ms ease;
+    transition: left 500ms ease;
   }
 
   &:hover::after {
@@ -433,7 +354,7 @@ const Sidebar = styled.div`
     width: 10em;
   }
 
-  @media only screen and (max-width: 500px) {
+  @media only screen and (max-width: 31rem) {
     &:hover::after {
       left: 75vw;
     }
@@ -482,23 +403,10 @@ const HeartButton = styled(ImHeart)`
   height: 4em;
 
   color: var(--secondary-foreground);
-`;
-const SidebarYear = styled(Link)`
-  width: min-content;
 
-  text-decoration: none;
-
-  font-size: 2em;
-  font-weight: bold;
-
-  &:link,
-  &:visited,
-  &:active {
-    color: inherit;
-  }
-
-  @media only screen and (min-width: 768px) {
-    rotate: 90deg;
+  transition: color 250ms ease;
+  &:hover {
+    color: #f14255;
   }
 `;
 
@@ -508,20 +416,6 @@ const Main = styled.div`
 
   display: flex;
   flex-direction: column;
-`;
-const MasonryGallery = styled(Masonry)`
-  display: flex;
-  margin-left: calc(var(--masonry-gutter-size) * -1);
-  width: 100%;
-
-  & > div {
-    padding-left: var(--masonry-gutter-size);
-    background-clip: padding-box;
-  }
-
-  & > div > img {
-    margin-bottom: var(--masonry-gutter-size);
-  }
 `;
 
 // Year Bar
@@ -577,11 +471,11 @@ const ImageFocusOverlayWrapper = styled.div<IImageFocusOverlayWrapper>`
   transition: 250ms opacity ease-out;
   ${props =>
     props.isShown &&
-    `
-    transition: 500ms opacity ease-out;
-    pointer-events: all;
-    opacity: 1;
-  `}
+    css`
+      transition: 500ms opacity ease-out;
+      pointer-events: all;
+      opacity: 1;
+    `}
 `;
 
 export default trackWindowScroll(Gallery);

@@ -24,9 +24,10 @@ export interface IArt {
 export interface IArtWithSector extends IArt {
   sector: string;
 }
+export type ISectorKey = keyof IGalleryImages['2023'];
 
-export type IDiscordImageID = `${number}/${number}`;
-export type IDiscordImageIDHyphenated = `${number}-${number}`;
+export type IDiscordImageID<Delimiter extends string = '/'> =
+  `${number}${Delimiter}${number}`;
 export type IDiscordImagePath = `${IDiscordImageID}/${string}`;
 export type IDiscordImageURL =
   | `https://media.discordapp.net/attachments/${IDiscordImagePath}`

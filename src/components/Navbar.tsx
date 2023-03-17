@@ -1,68 +1,74 @@
 // Packages
-import { useState, useEffect } from 'react'
-import styled from 'styled-components'
-import { Link, useLocation } from 'react-router-dom'
-import { Squeeze as SqueezeMenu } from 'hamburger-react'
-import { ImBookmark } from 'react-icons/im'
+import { useState, useEffect, useCallback } from 'react';
+import styled from 'styled-components';
+import { Link, useLocation } from 'react-router-dom';
+import { Squeeze as SqueezeMenu } from 'hamburger-react';
+import { ImBookmark } from 'react-icons/im';
 
 // Atoms
-import Logo from '../atoms/icons/Logo'
-import { isMobile } from 'react-device-detect'
+import Logo from '../atoms/icons/Logo';
+import { isMobile } from 'react-device-detect';
 
 // Types
 interface INavProps {
-  isMenuOpen: boolean
-  positionType?: string
+  isMenuOpen: boolean;
+  positionType?: string;
 }
 interface INavLinkWrapperProps {
-  isMenuOpen: boolean
+  isMenuOpen: boolean;
 }
 interface IMenuOpenState {
-  isScrolled: boolean
-  isHovered: boolean
+  isScrolled: boolean;
+  isHovered: boolean;
 }
 
 const shouldHidePathURLs = [
   { path: '/', type: ['scroll', 'hover'], position: 'fixed' },
   { path: '/gallery', type: ['hover'], position: 'fixed', check: 'includes' },
-]
+];
 function getPathURLConfig(path: string) {
   return shouldHidePathURLs.find(x =>
     x.check === 'includes' ? path.includes(x.path) : x.path === path
-  )
+  );
 }
 
 // Main
 function Navbar() {
   // Hooks
-  const location = useLocation()
+  const location = useLocation();
 
   // State
   const [isMenuOpen, setIsMenuOpen] = useState<IMenuOpenState | boolean>({
     isScrolled: false,
     isHovered: false,
-  })
+  });
   const menuOpen =
     typeof isMenuOpen === 'object'
       ? isMenuOpen.isHovered || isMenuOpen.isScrolled
-      : isMenuOpen
+      : isMenuOpen;
 
   // Events
   function onScroll() {
+    if (window.innerWidth < 768) return;
     setIsMenuOpen(prev => {
       if (typeof prev === 'object')
         return {
           ...prev,
           isScrolled: document.documentElement.scrollTop > 100 * 5,
-        }
+        };
       else
         return {
           isHovered: false,
           isScrolled: document.documentElement.scrollTop > 100 * 5,
-        }
-    })
+        };
+    });
   }
+
+  // FIX: When screen is resized, the menu doesnt work properly with mouse over
+  // This is because it only checks if its in a certain threshold, not if its touching the element
+  // Optimize both functions but not repetitively mutating state.
   function onMouseMove(e: MouseEvent) {
+    if (window.innerWidth < 768) return;
     setIsMenuOpen(prev => {
       if (typeof prev === 'object')
         return {
@@ -70,36 +76,40 @@ function Navbar() {
           isHovered:
             e.clientY <=
             3 * parseFloat(getComputedStyle(document.documentElement).fontSize),
-        }
+        };
       else
         return {
           isScrolled: false,
           isHovered:
             e.clientY <=
             3 * parseFloat(getComputedStyle(document.documentElement).fontSize),
-        }
-    })
+        };
+    });
   }
 
   // Effect
   useEffect(() => {
-    onScroll()
-    window.scrollTo(0, 0)
-    const shouldHideConfig = getPathURLConfig(location.pathname)
+    onScroll();
+    if (!location.pathname.includes('gallery')) window.scrollTo(0, 0);
+    const shouldHideConfig = getPathURLConfig(location.pathname);
 
-    if (isMobile) return setIsMenuOpen(false)
-    if (!shouldHideConfig) return setIsMenuOpen(true)
+    if (isMobile) return setIsMenuOpen(false);
+    if (!shouldHideConfig) return setIsMenuOpen(true);
 
     if (shouldHideConfig.type.includes('scroll'))
-      document.addEventListener('scroll', onScroll)
+      document.addEventListener('scroll', onScroll);
     if (shouldHideConfig.type.includes('hover'))
-      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mousemove', onMouseMove);
 
     return () => {
-      document.removeEventListener('scroll', onScroll)
-      document.removeEventListener('mousemove', onMouseMove)
-    }
-  }, [location.pathname])
+      document.removeEventListener('scroll', onScroll);
+      document.removeEventListener('mousemove', onMouseMove);
+    };
+  }, [location.pathname]);
+
+  const closeMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
 
   return (
     <>
@@ -114,10 +124,18 @@ function Navbar() {
         </NavInnerLeft>
         <NavInnerRight>
           <NavLinkWrapper isMenuOpen={menuOpen}>
-            <NavLink to='/gallery'>Gallery</NavLink>
-            <NavLink to='/commissions'>Commissions</NavLink>
-            <NavLink to='/store'>Store</NavLink>
-            <NavLink to='/about'>About</NavLink>
+            <NavLink onClick={closeMenu} to='/gallery'>
+              Gallery
+            </NavLink>
+            <NavLink onClick={closeMenu} to='/commissions'>
+              Commissions
+            </NavLink>
+            <NavLink onClick={closeMenu} to='/store'>
+              Store
+            </NavLink>
+            <NavLink onClick={closeMenu} to='/about'>
+              About
+            </NavLink>
           </NavLinkWrapper>
           <SqueezeWrapper>
             <SqueezeMenu
@@ -131,7 +149,7 @@ function Navbar() {
         </NavInnerRight>
       </Nav>
     </>
-  )
+  );
 }
 
 // Nav
@@ -154,14 +172,14 @@ const Nav = styled.nav<INavProps>`
   transition: top 1s ease-out,
     opacity 250ms ease-out ${props => (props.isMenuOpen ? '500ms' : '1ms')};
 
-  ${isMobile ? '&' : ':focus-within'} {
+  @media only screen and (max-width: 48rem) {
     top: 0;
     opacity: 1;
     position: sticky;
   }
 
   z-index: 999999;
-`
+`;
 const NavBookmark = styled(ImBookmark)`
   position: fixed;
   top: 0;
@@ -172,8 +190,11 @@ const NavBookmark = styled(ImBookmark)`
   width: 30px;
   height: 30px;
   filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
-  ${isMobile && 'display: none'}
-`
+
+  @media only screen and (max-width: 48rem) {
+    display: none;
+  }
+`;
 const NavInner = styled.div`
   width: max-content;
   height: 100%;
@@ -182,26 +203,26 @@ const NavInner = styled.div`
   display: flex;
   align-items: center;
   gap: 1em;
-`
+`;
 const NavInnerLeft = styled(NavInner)`
   padding: 0.75em 0.5em;
   text-decoration: none;
   user-select: none;
-`
+`;
 const NavInnerRight = styled(NavInner)`
   padding: 0.5em 0.25em;
-`
+`;
 const NavLink = styled(Link)`
   text-decoration: none;
   color: var(--foreground);
   font-size: 1.1em;
-`
+`;
 const NavLinkWrapper = styled.div<INavLinkWrapperProps>`
   display: flex;
   align-items: center;
   gap: 2em;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: 48rem) {
     transition: 500ms ease;
     overflow-x: hidden;
 
@@ -225,12 +246,12 @@ const NavLinkWrapper = styled.div<INavLinkWrapperProps>`
       border-bottom: none;
     }
 
-    @media only screen and (max-height: 750px) {
+    @media only screen and (max-height: 46rem) {
       padding-top: 125px;
       justify-content: flex-start;
     }
   }
-`
+`;
 
 const NavName = styled.p`
   color: var(--foreground);
@@ -238,13 +259,13 @@ const NavName = styled.p`
   font-size: clamp(1.3em, 2vw, 2em);
 
   font-weight: bold;
-`
+`;
 const SqueezeWrapper = styled.div`
   display: none;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: 48rem) {
     display: block;
   }
-`
+`;
 
-export default Navbar
+export default Navbar;

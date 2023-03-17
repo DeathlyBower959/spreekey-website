@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 interface IProps {
   children: JSX.Element | string;
@@ -37,9 +37,9 @@ const NotificationWrapper = styled.div<INotificationWrapper>`
 
   ${props =>
     !props.isOpen &&
-    `
-    bottom: -7em;
-  `}
+    css`
+      bottom: -7em;
+    `}
 
   overflow: hidden;
 `;

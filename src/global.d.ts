@@ -1,6 +1,6 @@
-declare module '*.jpg'
-declare module '*.png'
-declare module '*.webp'
+declare module '*.jpg';
+declare module '*.png';
+declare module '*.webp';
 
 type ColorName =
   | 'aliceblue'
@@ -142,14 +142,16 @@ type ColorName =
   | 'white'
   | 'whitesmoke'
   | 'yellow'
-  | 'yellowgreen'
+  | 'yellowgreen';
 
-type RGBColor = ColorName | `rgb(${number}, ${number}, ${number})`
-type RGBAColor = ColorName | `rgba(${number}, ${number}, ${number}, ${number})`
-type HSLColor = ColorName | `hsl(${number}, ${number}%, ${number}%)`
-type HSLAColor = ColorName | `hsl(${number}, ${number}%, ${number}%, ${number})`
-type HexColor = ColorName | `#${string}`
-type CSSVariable = `var(--${string})`
+type RGBColor = ColorName | `rgb(${number}, ${number}, ${number})`;
+type RGBAColor = ColorName | `rgba(${number}, ${number}, ${number}, ${number})`;
+type HSLColor = ColorName | `hsl(${number}, ${number}%, ${number}%)`;
+type HSLAColor =
+  | ColorName
+  | `hsl(${number}, ${number}%, ${number}%, ${number})`;
+type HexColor = ColorName | `#${string}`;
+type CSSVariable = `var(--${string})`;
 
 type Color =
   | ColorName
@@ -158,4 +160,4 @@ type Color =
   | HSLColor
   | HSLAColor
   | HexColor
-  | CSSVariable
+  | CSSVariable;
