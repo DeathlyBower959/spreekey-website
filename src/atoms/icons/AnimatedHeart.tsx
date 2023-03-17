@@ -1,8 +1,12 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components';
 
 interface IProps {
-  enabled: boolean
-  autoHide?: boolean
+  enabled: boolean;
+  autoHide?: boolean;
+}
+interface IWrapper {
+  enabled: boolean;
+  autoHide: boolean;
 }
 
 function Heart({ autoHide = false, enabled }: IProps) {
@@ -32,13 +36,13 @@ function Heart({ autoHide = false, enabled }: IProps) {
         />
       </svg>
     </Wrapper>
-  )
+  );
 }
 
 const HeartAnimationString = (props: any, name: string) =>
   props.enabled &&
-  `animation: 800ms cubic-bezier(0.66, 0.03, 0.27, 1.34) forwards ${name};`
-const Wrapper = styled.div<{ enabled: boolean; autoHide: boolean }>`
+  `animation: 800ms cubic-bezier(0.66, 0.03, 0.27, 1.34) forwards ${name};`;
+const Wrapper = styled.div<IWrapper>`
   cursor: pointer;
   position: relative;
 
@@ -95,9 +99,9 @@ const Wrapper = styled.div<{ enabled: boolean; autoHide: boolean }>`
       color: currentColor;
     }
   }
-`
+`;
 
-const Circle = styled.div<{ enabled: boolean; autoHide: boolean }>`
+const Circle = styled.div<IWrapper>`
   display: inline;
   height: 0;
   aspect-ratio: 1/1;
@@ -114,7 +118,10 @@ const Circle = styled.div<{ enabled: boolean; autoHide: boolean }>`
 
   ${props =>
     props.enabled &&
-    `animation: 550ms cubic-bezier(0.66, 0.03, 0.27, 1.34) forwards AnimateCircle;`}
+    css`
+      animation: 550ms cubic-bezier(0.66, 0.03, 0.27, 1.34) forwards
+        AnimateCircle;
+    `}
 
   @keyframes AnimateCircle {
     0% {
@@ -134,6 +141,6 @@ const Circle = styled.div<{ enabled: boolean; autoHide: boolean }>`
       border-width: 0;
     }
   }
-`
+`;
 
-export default Heart
+export default Heart;

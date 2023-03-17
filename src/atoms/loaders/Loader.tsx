@@ -1,8 +1,12 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
-function Loader() {
+interface IProps {
+  style?: React.StyleHTMLAttributes<HTMLDivElement>;
+}
+
+function Loader({ style }: IProps) {
   return (
-    <DotWrapper>
+    <DotWrapper style={style}>
       <LeftSide>
         <Dot className='dot'></Dot>
         <Dot className='dot'></Dot>
@@ -14,12 +18,12 @@ function Loader() {
         <Dot className='dot'></Dot>
       </RightSide>
     </DotWrapper>
-  )
+  );
 }
 
 const DotWrapper = styled.div`
-  position: absolute;
-`
+  position: relative;
+`;
 const Dot = styled.div`
   position: absolute;
 
@@ -27,11 +31,11 @@ const Dot = styled.div`
   width: 15px;
   height: 15px;
   border-radius: 50%;
-`
+`;
 
 const Side = styled.div`
   position: relative;
-`
+`;
 const LeftSide = styled(Side)`
   .dot:nth-child(1) {
     animation: 1.5s ease AnimatePositionLeft-0 infinite forwards;
@@ -97,7 +101,7 @@ const LeftSide = styled(Side)`
       scale: 1;
     }
   }
-`
+`;
 const RightSide = styled(Side)`
   .dot:nth-child(1) {
     animation: 1.5s ease AnimatePositionRight-0 infinite forwards;
@@ -163,6 +167,6 @@ const RightSide = styled(Side)`
       scale: 1;
     }
   }
-`
+`;
 
-export default Loader
+export default Loader;

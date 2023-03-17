@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router';
 import { useDoubleTap } from 'use-double-tap';
 import { isMobile, MobileOnlyView } from 'react-device-detect';
-import { Link } from 'react-router-dom';
 
 // Atoms
 import AnimatedHeart from './icons/AnimatedHeart';
@@ -19,8 +18,8 @@ import capitalize from '../util/upperCaseFirst';
 import { IDiscordImageURL } from '../galleryImages';
 import { useLocation } from 'react-router';
 interface IProps {
-  src: IDiscordImageURL;
-  initial: IDiscordImageURL;
+  src: IDiscordImageURL | null;
+  initial: IDiscordImageURL | null;
   alt?: string;
   year?: number;
   sector?: string;
@@ -34,7 +33,12 @@ interface IProps {
   month?: number;
   day?: number;
 
+  // width: number;
+
   scrollPosition: ScrollPosition;
+}
+interface IMiddleHeartPositionWrapper {
+  enabled: boolean;
 }
 
 // Main
@@ -49,6 +53,8 @@ function LazyGalleryImage({
 
   favoriteToggle,
   favorite,
+
+  // width,
 
   month,
   day,
@@ -72,7 +78,7 @@ function LazyGalleryImage({
   }
   function openExpandedView() {
     if (!location.pathname.match(/c\/[0-9]+-[0-9]+/)?.[0])
-      navigate(`c/${ID.split('/').join('-')}`);
+      navigate(`${ID.split('/').join('-')}`);
   }
   function handleClick() {
     if (isMobile) setIsOverlayOpen(prev => !prev);
@@ -89,13 +95,15 @@ function LazyGalleryImage({
           filter: isLoaded ? 'blur(0px)' : 'blur(10px)',
           opacity: isLoaded ? '1' : '0',
         }}
+        // style={{ width }}
       >
         <StyledLazyLoadImage
           style={{
             minHeight: isLoaded ? 0 : '25vh',
           }}
           afterLoad={() => setIsLoaded(true)}
-          src={src}
+          src={src || ''}
+          placeholderSrc={initial || ''}
           alt={alt}
           scrollPosition={scrollPosition}
           threshold={400}
@@ -125,7 +133,12 @@ function LazyGalleryImage({
             {month !== undefined && '.' + toRoman(month)}
             {month !== undefined && '.' + day}
           </DateOverlay>
-          <HeartWrapper onClick={favoriteToggle}>
+          <HeartWrapper
+            onClick={e => {
+              e.stopPropagation();
+              favoriteToggle();
+            }}
+          >
             <AnimatedHeart enabled={favorite} />
           </HeartWrapper>
         </Overlay>
@@ -178,7 +191,7 @@ const DateOverlay = styled(InnerOverlay)`
   left: 0.5em;
   top: 0.5em;
 `;
-// TODO: Accessibilty
+// TODO: Accessibility (tab-index)
 const OpenLargerOverlay = styled.div`
   font-size: 2.5em;
   position: absolute;
@@ -199,7 +212,7 @@ const HeartWrapper = styled.div`
   margin-right: 1em;
   margin-top: 1em;
 `;
-const MiddleHeartPositionWrapper = styled.div<{ enabled: boolean }>`
+const MiddleHeartPositionWrapper = styled.div<IMiddleHeartPositionWrapper>`
   ${props =>
     props.enabled &&
     'animation: 500ms cubic-bezier(0.99, -0.04, 0.35, 1.01) forwards ScaleOut 1.1s;'}

@@ -1,54 +1,65 @@
 // Packages
-import styled from 'styled-components'
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 
 // Assets
-import AboutImage from '../assets/background/about-hero.jpg'
+import AboutImage from '../assets/background/about-hero.jpg';
 
 // Atoms
-import LazyImage from '../atoms/LazyImage'
+import LazyImage from '../atoms/LazyImage';
 
 function About() {
   return (
-    <Wrapper>
-      <Image src={AboutImage} />
-      <TextWrapper>
-        <Title>spreekey</Title>
-        <Content>
-          An artist who enjoys character design, illustration, and story-making.
-          Has been drawing for over 6 years, primarily digitally: working to
-          improve their skill and experience in the industry. 5th Generation
-          IPad Mini and an offbrand apple pencil as the tools of the trade.
-          Hoping to work on animations and web-comics in the future, with{' '}
-          <InnerLink href='https://toyhou.se/spreekey/characters'>
-            personal characters
-          </InnerLink>{' '}
-          and stories.
-        </Content>
-        <SocialsWrapper>
-          <SocialTitle>
-            twitter:{' '}
-            <SocialLink href='https://twitter.com/spreekey'>
-              @spreekey
-            </SocialLink>
-          </SocialTitle>
-          <SocialTitle>
-            toyhouse:{' '}
-            <SocialLink href='https://toyhou.se/spreekey'>spreekey</SocialLink>
-          </SocialTitle>
-          <SocialTitle>
-            instagram:{' '}
-            <SocialLink href='https://instagram.com/spreekey'>
-              @spreekey
-            </SocialLink>
-          </SocialTitle>
-          <SocialTitle>
-            ko-fi:{' '}
-            <SocialLink href='https://ko-fi.com/spreekey'>spreekey</SocialLink>
-          </SocialTitle>
-        </SocialsWrapper>
-      </TextWrapper>
-    </Wrapper>
-  )
+    <>
+      <Wrapper>
+        <Image src={AboutImage} />
+        <TextWrapper>
+          <Title>spreekey</Title>
+          <Content>
+            An artist who enjoys character design, illustration, and
+            story-making. Has been drawing for over 6 years, primarily
+            digitally: working to improve their skill and experience in the
+            industry. 5th Generation IPad Mini and an offbrand apple pencil as
+            the tools of the trade. Hoping to work on animations and web-comics
+            in the future, with{' '}
+            <InnerLink href='https://toyhou.se/spreekey/characters'>
+              personal characters
+            </InnerLink>{' '}
+            and stories.
+          </Content>
+          <SocialsWrapper>
+            <SocialTitle>
+              twitter:{' '}
+              <SocialLink href='https://twitter.com/spreekey'>
+                @spreekey
+              </SocialLink>
+            </SocialTitle>
+            <SocialTitle>
+              toyhouse:{' '}
+              <SocialLink href='https://toyhou.se/spreekey'>
+                spreekey
+              </SocialLink>
+            </SocialTitle>
+            <SocialTitle>
+              instagram:{' '}
+              <SocialLink href='https://instagram.com/spreekey'>
+                @spreekey
+              </SocialLink>
+            </SocialTitle>
+            <SocialTitle>
+              ko-fi:{' '}
+              <SocialLink href='https://ko-fi.com/spreekey'>
+                spreekey
+              </SocialLink>
+            </SocialTitle>
+          </SocialsWrapper>
+        </TextWrapper>
+        <CreditWeeee href='https://github.com/DeathlyBower959'>
+          Built by: DeathlyBower959
+        </CreditWeeee>
+      </Wrapper>
+    </>
+  );
 }
 
 const Wrapper = styled.div`
@@ -58,10 +69,10 @@ const Wrapper = styled.div`
   display: grid;
   justify-items: center;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: 48rem) {
     margin: 1.5em 0;
   }
-`
+`;
 
 const Image = styled(LazyImage)`
   width: 600px;
@@ -73,7 +84,7 @@ const Image = styled(LazyImage)`
   /* transform: translateX(-200px); */
   margin-right: 200px;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: 48rem) {
     width: 95vw;
     margin-top: 3rem;
 
@@ -84,7 +95,7 @@ const Image = styled(LazyImage)`
   grid-column: 1;
 
   z-index: -1;
-`
+`;
 
 const TextWrapper = styled.div`
   background-color: var(--secondary-background);
@@ -107,7 +118,7 @@ const TextWrapper = styled.div`
 
   line-height: 200%;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: 48rem) {
     width: 90vw;
     height: min-content;
     min-width: 260px;
@@ -125,21 +136,33 @@ const TextWrapper = styled.div`
 
   grid-row: 1;
   grid-column: 1;
-`
+`;
 
-const Title = styled.h1``
-const Content = styled.p``
+const Title = styled.h1``;
+const Content = styled.p``;
 const InnerLink = styled.a.attrs({ target: '_blank' })`
   color: var(--link-accent);
-`
+`;
 
 const SocialsWrapper = styled.div`
   margin-bottom: 0 !important;
   line-height: 115%;
-`
-const SocialTitle = styled.p``
+`;
+const SocialTitle = styled.p``;
 const SocialLink = styled.a.attrs({ target: '_blank' })`
   color: var(--link-accent);
-`
+`;
 
-export default About
+const CreditWeeee = styled.a.attrs({ target: '_blank' })`
+  color: var(--foreground);
+  background-color: var(--secondary-background);
+  padding: 1em 2em;
+  position: absolute;
+  bottom: 1rem;
+  border-radius: 8px;
+  opacity: 0.5;
+
+  text-decoration: none;
+`;
+
+export default About;

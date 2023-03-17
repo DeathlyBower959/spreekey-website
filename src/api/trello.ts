@@ -1,81 +1,93 @@
-import { Fields, List, Card } from './types'
+import { z } from 'zod';
 
-import Axios from 'axios'
-import { trelloConfig } from '../config'
+import { trelloConfig } from '../config';
+import { get } from './wrapper';
 
-export async function getLists(fields: Fields = null): Promise<List[]> {
-  try {
-    const res = await Axios.get(
-      `${trelloConfig.API}/boards/${trelloConfig.BOARD_ID}/lists${
-        fields && `?fields=${fields.join(',')}`
-      }`
-    )
+// Zod
+export const labelSchema = z.object({
+  id: z.string(),
+  idBoard: z.string(),
+  name: z.string(),
+  color: z.string(),
+});
+export const cardSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  labels: z.array(labelSchema).optional(),
+  shortUrl: z.string(),
+  desc: z.string(),
+});
+export const listSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  cards: z.array(cardSchema).optional(),
+});
+export const boardSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  shortUrl: z.string().url(),
+  lists: z.array(listSchema).optional(),
+});
 
-    return res.data
-  } catch (error: any) {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      return error.response
-    } else if (error.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
+export type Fields = string[];
+export type Board = z.infer<typeof boardSchema>;
+export type List = z.infer<typeof listSchema>;
 
-      return error.request
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log('Error', error.message)
-      return error
-    }
-  }
+export type Card = z.infer<typeof cardSchema>;
+export type Label = z.infer<typeof labelSchema>;
+
+// API
+export async function getBoards(fields: Fields = []) {
+  return get<Board[]>(
+    `/organizations/${trelloConfig.WORKSPACE_ID}/boards`,
+    fields,
+    z.array(boardSchema)
+  );
 }
 
-export async function getCards(
-  listID: string,
-  fields: Fields = null
-): Promise<Card[]> {
-  try {
-    const res = await Axios.get(
-      `${trelloConfig.API}/lists/${listID}/cards${
-        fields && `?fields=${fields.join(',')}`
-      }`
-    )
-
-    return res.data
-  } catch (error: any) {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      return error.response
-    } else if (error.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-
-      return error.request
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log('Error', error.message)
-      return error
-    }
-  }
+export async function getLists(boardId: string, fields: Fields = []) {
+  return get<List[]>(`/boards/${boardId}/lists`, fields, z.array(listSchema));
 }
 
-export function getTrelloData(): Promise<List[]> {
-  return new Promise(async (resolve, reject) => {
-    const lists = await getLists(['id', 'name'])
+export async function getCards(listID: string, fields: Fields = []) {
+  return get<Card[]>(`/lists/${listID}/cards`, fields, z.array(cardSchema));
+}
 
-    if (!lists) reject('Error fetching Trello data')
+export async function getTrelloData(): Promise<Board[]> {
+  const boards = await getBoards(['name', 'shortUrl']);
 
-    let data = [...lists]
+  if (!boards) throw new Error('Failed to retrieve boards');
 
-    lists.forEach(async (list, idx: number) => {
-      const cards = await getCards(list.id, ['name', 'labels', 'shortUrl'])
-      // Even if cards are null
-      data[idx] = { ...data[idx], cards: cards.length === 0 ? null : cards }
-    })
+  let data: Board[] = [];
 
-    resolve(data)
-  })
+  for (let bIdx = 0; bIdx < boards.length; bIdx++) {
+    const board = boards[bIdx];
+
+    const lists = await getLists(board.id, ['name']);
+
+    let listData: List[] = [];
+
+    for (let lIdx = 0; lIdx < lists.length; lIdx++) {
+      const list = lists[lIdx];
+
+      const cards = await getCards(list.id, [
+        'name',
+        'labels',
+        'shortUrl',
+        'desc',
+      ]);
+
+      listData.push({
+        ...list,
+        cards: cards || [],
+      });
+    }
+
+    data.push({
+      ...board,
+      lists: listData,
+    });
+  }
+
+  return data;
 }

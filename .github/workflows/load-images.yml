@@ -7,7 +7,6 @@ on:
 
   workflow_dispatch:
   push:
-    branches: ['production']
 
 jobs:
   get-images:
@@ -21,7 +20,7 @@ jobs:
           node-version: 16
 
       - name: Install packages
-        run: cd .action && npm i
+        run: npm run action:install
 
       - name: Create .env
         run: |
@@ -29,7 +28,7 @@ jobs:
           echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} >> .action/.env
 
       - name: Run TS Action
-        run: cd .action && npm run start
+        run: npm run action:start
 
       - name: Check for modified files
         id: git-check

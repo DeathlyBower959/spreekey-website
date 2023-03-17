@@ -12,6 +12,7 @@
   --secondary-background: #191f1f;
   --tertiary-background: #273030;
   --nav-background: 23, 36, 36; /* rgba(23, 36, 36) */
+  --code-background: var(--tertiary-background);
 
   /* Foreground */
   --foreground: #acc3bb;
@@ -21,6 +22,8 @@
   /* --accent: #b3934e; */
   --accent: #911a24;
   --link-accent: #94d9c1;
+  --comms-open: #166716;
+  --comms-closed: #671616;
 
   /* Scrollbar */
   --scrollbar-thumb: #72141c66;
@@ -104,6 +107,12 @@ body {
   );
 }
 
+code {
+  background-color: var(--code-background);
+  padding: 0.1em 0.25em;
+  border-radius: 5px;
+}
+
 /* Scrollbar */
 /* Firefox */
 * {
@@ -135,29 +144,8 @@ body {
   background-color: var(--scrollbar-thumb-hover);
 }
 
-/* InfoGroup Container Query */
-@container InfoBar (width < 500px) {
-  /* Used for specificity */
-  .infoGroup.infoGroup {
-    justify-content: center;
-    flex-direction: column;
-  }
-
-  .infoBar.infoBar {
-    height: 0;
-    position: absolute;
-    overflow: hidden;
-    bottom: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    flex-direction: column;
-
-    transition: height 500ms ease-out, padding 500ms ease-out;
-  }
-
-  .infoBar.infoBar:focus-within {
-    height: 15em;
-    padding: 1.5em 0;
-  }
+/* It defaults to inline-block, breaking gallery page */
+.lazy-load-image-background {
+  display: block !important;
 }
 

@@ -1,17 +1,17 @@
 // Packages
-import styled from 'styled-components'
-import Parallax from 'parallax-js'
-import { useLayoutEffect, useRef } from 'react'
-import LazyImage from '../atoms/LazyImage'
+import styled from 'styled-components';
+import Parallax from 'parallax-js';
+import { useLayoutEffect, useRef } from 'react';
+import LazyImage from '../atoms/LazyImage';
 
 // Layers
-import VignetteImage from '../assets/404/Vignette.webp'
-import SilkeImage from '../assets/404/Silke.webp'
-import PipeImage from '../assets/404/Pipe.webp'
-import SalvElieImage from '../assets/404/SalvElie.webp'
-import SunImage from '../assets/404/Sun.webp'
-import MothImage from '../assets/404/Moth.webp'
-import BackgroundImage from '../assets/404/Background.webp'
+import VignetteImage from '../assets/404/Vignette.webp';
+import SilkeImage from '../assets/404/Silke.webp';
+import PipeImage from '../assets/404/Pipe.webp';
+import SalvElieImage from '../assets/404/SalvElie.webp';
+import SunImage from '../assets/404/Sun.webp';
+import MothImage from '../assets/404/Moth.webp';
+import BackgroundImage from '../assets/404/Background.webp';
 
 // Types
 interface ILayerProps {
@@ -31,23 +31,23 @@ interface ILayerProps {
     | 'hue'
     | 'saturation'
     | 'color'
-    | 'luminosity'
-  opacity?: number
-  'data-depth': string
+    | 'luminosity';
+  opacity?: number;
+  'data-depth': string;
 }
 
 // Main
 function PageNotFound() {
-  const parallaxRef = useRef<HTMLDivElement>(null)
+  const parallaxRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const node: any = parallaxRef.current
+    const node: any = parallaxRef.current;
     if (node)
       new Parallax(node, {
         limitY: 0,
         precision: 1,
-      })
-  }, [])
+      });
+  }, []);
 
   // 404 text
   return (
@@ -69,12 +69,12 @@ function PageNotFound() {
         <Text404>404</Text404>
       </SceneWrapper>
     </>
-  )
+  );
 }
 
 const SceneWrapper = styled.div`
   width: 100%;
-  height: calc(100vh - 5em);
+  height: calc(100vh - 5rem);
 
   display: flex;
   justify-content: center;
@@ -82,7 +82,7 @@ const SceneWrapper = styled.div`
 
   overflow: hidden;
   filter: saturate(1.1);
-`
+`;
 
 // QUICKHACK: Make parallax not cut of image, and remove layerY restriction
 const Layer = styled(LazyImage)<ILayerProps>`
@@ -99,7 +99,7 @@ const Layer = styled(LazyImage)<ILayerProps>`
   opacity: ${props => props.opacity || '1'};
 
   /* overflow: hidden; */
-`
+`;
 const Text404 = styled.h1`
   background: transparent;
   backdrop-filter: blur(3px);
@@ -121,6 +121,6 @@ const Text404 = styled.h1`
   top: 50% !important;
 
   transform: translateX(-50%) translateY(-50%) !important;
-`
+`;
 
-export default PageNotFound
+export default PageNotFound;

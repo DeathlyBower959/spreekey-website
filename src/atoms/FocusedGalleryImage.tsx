@@ -1,5 +1,5 @@
 // Packages
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useDoubleTap } from 'use-double-tap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BiLinkExternal } from 'react-icons/bi';
@@ -13,16 +13,15 @@ import capitalize from '../util/upperCaseFirst';
 
 // Atoms
 import AnimatedHeart from './icons/AnimatedHeart';
-import Loader from './loaders/Loader';
 
 // Types
 import { IDiscordImageURL } from '../galleryImages';
 import getObjectRects from '../util/renderedImageSize';
-import { useWindowResize } from '../hooks/useWindowResize';
+import useWindowResize from '../hooks/useWindowResize';
 import { isMobile } from 'react-device-detect';
 
 interface IProps {
-  src: IDiscordImageURL;
+  src: IDiscordImageURL | null;
   alt?: string;
   year?: number;
   sector?: string;
@@ -43,6 +42,12 @@ interface IImageWrapper {
 }
 interface IHeartPos {
   enabled: boolean;
+}
+interface IInfoBar {
+  isOpen: boolean;
+}
+interface IStyledImage {
+  infoBarHeight: number;
 }
 
 // Main
@@ -68,9 +73,12 @@ function FocusedGalleryImage({
   const location = useLocation();
   const [windowWidth] = useWindowResize();
 
-  const handleDoubleTap = useDoubleTap(doubleTap, 200);
+  const handleDoubleTap = useDoubleTap(doubleTap, 200, {
+    onSingleTap: () => setIsInfoBarOpen(false),
+  });
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isInfoBarOpen, setIsInfoBarOpen] = useState(false);
   const [infoBarWidth, setInfoBarWidth] = useState<number>(0);
   const imageRef = useRef<HTMLImageElement>(null);
   const infoBarRef = useRef<HTMLDivElement>(null);
@@ -86,13 +94,14 @@ function FocusedGalleryImage({
     setInfoBarWidth(getObjectRects(imageRef.current).positioned.width);
   }, [windowWidth]);
 
+  if (!src) return null;
+
   return (
-    <>
-      {!isLoaded && <Loader />}
+    <div onClick={e => e.stopPropagation()}>
       <ImageWrapper {...handleDoubleTap} isLoaded={isLoaded}>
         <CloseIcon
           onClick={() =>
-            navigate(location.pathname.replace(/c\/[0-9]+-[0-9]+/, ''))
+            navigate(location.pathname.replace(/(\d+-\d+\/?)+/, ''))
           }
         />
 
@@ -111,8 +120,14 @@ function FocusedGalleryImage({
           }}
         />
 
-        <InfoTab />
+        <InfoTab
+          onClick={e => {
+            e.stopPropagation();
+            setIsInfoBarOpen(true);
+          }}
+        />
         <InfoBar
+          isOpen={isInfoBarOpen}
           style={{
             width: imageRef.current ? infoBarWidth + 'px' : 'auto',
           }}
@@ -122,7 +137,6 @@ function FocusedGalleryImage({
             <InfoInterested to='/commissions'>Interested?</InfoInterested>
           </InfoGroup>
 
-          {/* Center me please wtf */}
           <InfoGroup style={{ flex: 1 }}>
             <InfoYearText>
               {year}
@@ -137,7 +151,7 @@ function FocusedGalleryImage({
 
           <InfoGroup style={{ gap: '0.25em' }}>
             <InfoOpenOriginal href={cleanURL(src)}>
-              Open Original
+              Higher Quality
             </InfoOpenOriginal>
             <NewLinkIcon />
           </InfoGroup>
@@ -149,7 +163,7 @@ function FocusedGalleryImage({
           </MiddleHeartWrapper>
         </MiddleHeartPositionWrapper>
       </ImageWrapper>
-    </>
+    </div>
   );
 }
 
@@ -168,8 +182,10 @@ const ImageWrapper = styled.div<IImageWrapper>`
 
   ${props =>
     props.isLoaded &&
-    `opacity: 1;
-  filter: blur(0);`}
+    css`
+      opacity: 1;
+      filter: blur(0);
+    `}
 `;
 
 const NewLinkIcon = styled(BiLinkExternal)`
@@ -177,7 +193,7 @@ const NewLinkIcon = styled(BiLinkExternal)`
   /* Resizing for some reason */
 `;
 
-const StyledImage = styled.img<{ infoBarHeight: number }>`
+const StyledImage = styled.img<IStyledImage>`
   /* max-height: calc(100% - ${props => props.infoBarHeight}px); */
   /* height: calc(100% - ${props => props.infoBarHeight}px); */
   width: 90vw;
@@ -243,7 +259,7 @@ const MiddleHeartWrapper = styled.div`
 `;
 
 // Info Bar
-const InfoBar = styled.div`
+const InfoBar = styled.div<IInfoBar>`
   background-color: var(--secondary-background);
   padding: 0.5em 1em;
 
@@ -254,7 +270,7 @@ const InfoBar = styled.div`
   justify-content: space-between;
   gap: 1em;
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 50rem) {
     height: 0;
     position: absolute;
     overflow: hidden;
@@ -269,6 +285,11 @@ const InfoBar = styled.div`
       height: 15em;
       padding: 1.5em 0;
     }
+
+    ${props =>
+      props.isOpen &&
+      `height: 15em;
+      padding: 1.5em 0;`}
   }
 `;
 const InfoGroup = styled.div`
@@ -277,11 +298,11 @@ const InfoGroup = styled.div`
   justify-content: center;
   gap: 1em;
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 50rem) {
     flex-direction: column;
   }
 `;
-const InfoTab = styled.div.attrs({ tabIndex: 1 })`
+const InfoTab = styled.div`
   display: none;
 
   position: absolute;
@@ -292,16 +313,11 @@ const InfoTab = styled.div.attrs({ tabIndex: 1 })`
   transform: translateX(-50%);
   bottom: 0;
 
-  &:focus ~ ${InfoBar} {
-    height: 15em;
-    padding: 1.5em 0;
-  }
-
   border-bottom: 2px solid var(--tertiary-background);
 
   border-radius: 8px 8px 0 0;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: 48rem) {
     display: block;
   }
 `;

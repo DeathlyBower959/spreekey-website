@@ -1,12 +1,31 @@
 export const trelloConfig = {
   API: 'https://api.trello.com/1',
-  BOARD_ID: 'gNpRKEbT',
-}
-export const YEAR_RANGE = [2017, new Date().getFullYear()]
+  WORKSPACE_ID: 'spreekey_',
+  LABEL_KEYS: {
+    PAID: ['paid'],
+    UNPAID: ['unpaid'],
+    NOT_STARTED: ['not started'],
+    IN_PROGRESS: ['in progress'],
+    COMPLETED: ['completed'],
+    VR: ['vr'],
+    OWED_ART: ['owed art'],
+  },
+  TOS: {
+    PREFIXED_CHARACTER: '>',
+    TITLE_ENCAPSULATION_CHARACTERS: ['[', ']'],
+  },
+};
+export const YEAR_RANGE = [2017, new Date().getFullYear()] as const;
 // 1 = None
 // 2 = Half screen width
 // 3 = 1/3 screen width, etc.
 export const IMAGE_COMPRESSION = {
-  default: 2.5,
+  default: 2,
   preview: 20,
-}
+};
+
+export const FLIPPER = {
+  MAX_ROTATIONS: 15,
+  DELAY_INTERVAL: 75,
+  OFFSET_TIME: 250,
+};
