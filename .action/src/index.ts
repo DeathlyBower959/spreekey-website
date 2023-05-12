@@ -102,9 +102,12 @@ function PopulateMessages(
             return;
           }
 
-          let probeResult = await probe(url).catch(err => {
-            ImageLog.error('Failed to load image: ', url, err);
-          });
+          let probeResult: probe.ProbeResult | null = null;
+
+          if (attachment.contentType !== 'image/gif')
+            probeResult = (await probe(url).catch(err => {
+              ImageLog.error('Failed to load image: ', url, err);
+            })) as probe.ProbeResult;
 
           // Defaults in case of probe failure
           if (!probeResult)
@@ -131,9 +134,8 @@ function PopulateMessages(
 
           outMessages.push(data);
         });
-
-        res(outMessages);
       });
+      res(outMessages);
     } catch (err) {
       rej(err);
     }
@@ -148,7 +150,7 @@ async function GetMessages(
   GUILD: Guild
 ): Promise<IGalleryImages> {
   let out: IGalleryImages = {};
-  for (let i = 0; i < Object.keys(channelIDs).length; i++) {
+  for (let i = Object.keys(channelIDs).length - 1; i >= 0; i--) {
     const year = Object.keys(channelIDs)[i];
 
     let mainChannel;
@@ -218,9 +220,9 @@ client.on('ready', async () => {
     return;
   }
 
-  const CATEGORIES = GUILD?.channels.cache.filter(
-    channel => channel.type === 4 && channel.name.match(/[0-9]{3}/)
-  );
+  const CATEGORIES = GUILD?.channels.cache
+    .filter(channel => channel.type === 4 && channel.name.match(/[0-9]{3}/))
+    .sort((chanA, chanB) => parseInt(chanB.name) - parseInt(chanA.name));
 
   if (CATEGORIES?.size <= 0) {
     BotLog.error('Failed to find categories');
@@ -254,7 +256,8 @@ client.on('ready', async () => {
 
       Log.info(
         `Channel found: ${
-          index[0].toUpperCase() + index.substring(1, index.length)
+          channel.name[0].toUpperCase() +
+          channel.name.substring(1, channel.name.length)
         }`
       );
       channels[index] = channel.id;

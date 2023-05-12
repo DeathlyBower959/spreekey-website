@@ -156,10 +156,11 @@ const CreditWeeee = styled.a.attrs({ target: '_blank' })`
   color: var(--foreground);
   background-color: var(--secondary-background);
   padding: 1em 2em;
-  position: absolute;
-  bottom: 1rem;
   border-radius: 8px;
   opacity: 0.5;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  height: min-content;
 
   text-decoration: none;
 `;
