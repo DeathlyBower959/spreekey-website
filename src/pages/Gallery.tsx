@@ -58,7 +58,8 @@ export function formatURL(
   const WIDTH = limitNumberWithinRange(
     window.innerWidth / compression,
     500,
-    1800
+    // 1800
+    1080
   );
 
   return `${url}?width=${Math.ceil(WIDTH)}&height=${Math.ceil(

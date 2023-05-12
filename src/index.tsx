@@ -21,3 +21,32 @@ root.render(
   </React.StrictMode>
 );
 
+function formatStyleObject(style: React.CSSProperties) {
+  let outStyle = '';
+
+  for (const [key, value] of Object.entries(style)) {
+    outStyle += `${
+      key
+        .match(/[A-Z]?[a-z]+/g)
+        ?.join('-')
+        .toLowerCase() || 'UNKNOWN'
+    }:${value}; `;
+  }
+
+  return outStyle.trim();
+}
+
+function writeConsole(value: string, ...styles: React.CSSProperties[]) {
+  console.log(`%c${value}`, ...styles.map(arg => formatStyleObject(arg)));
+}
+
+writeConsole(
+  `I know the gallery page is slow, im working on optimizations with masonic and maybe another method, I simply wanted to get a %cproduction version out.`,
+  {
+    fontSize: '1.5em',
+  },
+  {
+    color: 'red',
+    fontSize: '1.5em',
+  }
+);
