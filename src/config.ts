@@ -6,9 +6,11 @@ export const trelloConfig = {
     UNPAID: ['unpaid'],
     NOT_STARTED: ['not started'],
     IN_PROGRESS: ['in progress'],
-    COMPLETED: ['completed'],
+    COMPLETE: ['complete'],
     VR: ['vr'],
     OWED_ART: ['owed art'],
+    CONCEPT: ['concept'],
+    ANIMATED: ['animated'],
   },
   TOS: {
     PREFIXED_CHARACTER: '>',

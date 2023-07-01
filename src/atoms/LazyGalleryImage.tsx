@@ -43,6 +43,7 @@ interface IMiddleHeartPositionWrapper {
 
 // Main
 // FIX: Favorites refreshing entire page upon unfavorite (/gallery/favorites)
+// FIX: Doesn't detect double tap on mobile
 function LazyGalleryImage({
   src,
   initial,
@@ -69,9 +70,19 @@ function LazyGalleryImage({
   const [isLoaded, setIsLoaded] = useState(false);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
-  const handleDoubleTap = useDoubleTap(doubleTap, 200, {
-    onSingleTap: handleClick,
-  });
+  const handleDoubleTap = useDoubleTap(
+    () => {
+      favoriteToggle();
+      localStorage.setItem('spreekey-has_double_tapped_to_favorite', 'true');
+    },
+    400,
+    {
+      onSingleTap: () => {
+        if (isMobile) setIsOverlayOpen(prev => !prev);
+        else openExpandedView();
+      },
+    }
+  );
   function doubleTap() {
     favoriteToggle();
     localStorage.setItem('spreekey-has_double_tapped_to_favorite', 'true');
