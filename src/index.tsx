@@ -1,13 +1,12 @@
+import './index.css';
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-
 // Fonts
 // import './fonts/FILENAME.ttf'
-
 import { BrowserRouter } from 'react-router-dom';
 
-import './index.css';
+import App from './App';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -41,7 +40,7 @@ function writeConsole(value: string, ...styles: React.CSSProperties[]) {
 }
 
 writeConsole(
-  `I know the gallery page is slow, im working on optimizations with masonic and maybe another method, I simply wanted to get a %cproduction version out.`,
+  `Currently working on an app rewrite, fixing the gallery page optimizations, and possibly introducing some nice new features :>`,
   {
     fontSize: '1.5em',
   },
@@ -50,3 +49,5 @@ writeConsole(
     fontSize: '1.5em',
   }
 );
+
+fetch('http://localhost:3000/api/trello');

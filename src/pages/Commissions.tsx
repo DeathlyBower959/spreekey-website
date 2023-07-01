@@ -1,16 +1,17 @@
-// Packages
-import styled, { css } from 'styled-components';
-import Flipper from '../atoms/Flipper';
 import { useCallback, useEffect, useState } from 'react';
 import { FaVrCardboard } from 'react-icons/fa';
 import { MdChecklistRtl } from 'react-icons/md';
+// Packages
+import styled, { css } from 'styled-components';
+import { z } from 'zod';
 
 import { boardSchema, getTrelloData } from '../api/trello';
-import { trelloConfig } from '../config';
-import Loader from '../atoms/loaders/Loader';
+import Flipper from '../atoms/Flipper';
+import MemoAnimated from '../atoms/icons/Animated';
 import ReloadIcon from '../atoms/icons/Reload';
+import Loader from '../atoms/loaders/Loader';
+import { trelloConfig } from '../config';
 import useLocalStorage from '../hooks/useLocalStorage';
-import { z } from 'zod';
 
 type ITrelloData = Awaited<ReturnType<typeof getTrelloData>>;
 
@@ -112,25 +113,26 @@ function Commissions() {
 
                   if ((list.cards?.length || 0) <= 0) return null;
                   return list.cards?.map(card => {
-                    const name = card.name.split(' ')[1];
-                    if (!name) return null;
+                    const nameSplit = card.name.split(' ');
+                    const name = nameSplit[1];
+                    // if (!name) return null;
 
-                    const type = card.name
-                      .match(/\w+/)?.[0]
+                    const type = nameSplit[0]
+                      .match(/.+/)?.[0]
                       .replace('[', '')
                       .replace(']', '');
-                    if (!type) return null;
+                    // if (!type) return null;
 
                     const acceptedDate = card.desc
                       .match(
-                        /Date accepted: ([0-9]{1,2}).([0-9]{1,2}).([0-9]{1,2})/
+                        /Date accepted: ([0-9]{1,2})(.|-)([0-9]{1,2})(.|-)([0-9]{1,2})/
                       )?.[0]
                       .split(': ')[1];
-                    if (!acceptedDate) return null;
-
-                    let status;
+                    // if (!acceptedDate) return null;
 
                     if (!card.labels) return null;
+
+                    let status;
 
                     function isLabel(
                       labelFlag: keyof typeof trelloConfig.LABEL_KEYS
@@ -142,10 +144,14 @@ function Commissions() {
                       );
                     }
 
+                    if (isLabel('COMPLETE')) return null;
+
                     if (isLabel('UNPAID')) {
                       status = 'Unpaid';
                     } else if (isLabel('NOT_STARTED')) {
                       status = 'Not started';
+                    } else if (isLabel('CONCEPT')) {
+                      status = 'Concept';
                     } else if (isLabel('IN_PROGRESS')) {
                       status = 'In progress';
                     }
@@ -156,22 +162,46 @@ function Commissions() {
                     return (
                       <TimetableRow key={card.id}>
                         <TimetableTagCell>
-                          {isLabel('VR') && <FaVrCardboard />}
-                          {isLabel('OWED_ART') && <MdChecklistRtl />}
+                          <div
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: '1fr 1fr',
+                              gap: '0.35em',
+                              direction: 'rtl',
+                              alignItems: 'center',
+                            }}
+                          >
+                            {isLabel('VR') && <FaVrCardboard title='VR' />}
+                            {isLabel('OWED_ART') && (
+                              <MdChecklistRtl title='owed art' />
+                            )}
+                            {isLabel('ANIMATED') && (
+                              <MemoAnimated title='animated' />
+                            )}
+                          </div>
                         </TimetableTagCell>
                         <TimetableCell
-                          children={<Flipper current={name} delay={400} />}
-                        />
-                        <TimetableCell
-                          children={<Flipper current={type} delay={550} />}
-                        />
-                        <TimetableCell
                           children={
-                            <Flipper current={acceptedDate} delay={700} />
+                            <Flipper current={name || 'N/A'} delay={400} />
                           }
                         />
                         <TimetableCell
-                          children={<Flipper current={status} delay={850} />}
+                          children={
+                            <Flipper current={type || 'N/A'} delay={550} />
+                          }
+                        />
+                        <TimetableCell
+                          children={
+                            <Flipper
+                              current={acceptedDate || 'N/A'}
+                              delay={700}
+                            />
+                          }
+                        />
+                        <TimetableCell
+                          children={
+                            <Flipper current={status || 'N/A'} delay={850} />
+                          }
                         />
                       </TimetableRow>
                     );
@@ -339,7 +369,7 @@ const TimetableTagCell = styled.td`
   font-size: 1.5em;
 
   > * {
-    margin-right: 0.35em;
+    /* margin-right: 0.35em; */
   }
 `;
 
